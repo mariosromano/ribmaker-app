@@ -1,11 +1,11 @@
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback } from 'react';
 import type {
   RibParams,
   InstallationMode,
   LightingPreset,
 } from '../engine/types';
 import { WAVE_TYPES } from '../engine/types';
-import { loadImageData, clearImageData, hasImageData, calculatePricing } from '../engine/ribEngine';
+import { loadImageData, clearImageData, hasImageData } from '../engine/ribEngine';
 
 interface ControlPanelProps {
   params: RibParams;
@@ -196,44 +196,11 @@ export default function ControlPanel(props: ControlPanelProps) {
     [handleImageUpload]
   );
 
-  const pricing = useMemo(
-    () => calculatePricing(params, installationMode, ledEnabled),
-    [params, installationMode, ledEnabled]
-  );
-
-  const fmtPrice = (n: number) =>
-    '$' + n.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
-
   const curveControlSpacing = params.height / (params.controlPoints - 1);
   const curveSegmentSize = params.height / params.displayResolution;
 
   return (
     <div>
-      {/* Brand + Price */}
-      <div className="flex items-start justify-between mb-1">
-        <div>
-          <div className="text-[20px] font-bold tracking-tight leading-tight">
-            M<span className="text-[#7c9bff] mx-0.5">|</span>R Walls
-          </div>
-          <div className="text-[13px] font-medium text-[#aaa] mt-0.5">Rib Maker</div>
-        </div>
-        <div className="bg-[#2d4a2d] rounded-lg px-3 py-2 text-right shrink-0 ml-3">
-          <div className="text-[8px] text-[#8eff8e]/60 uppercase tracking-wider leading-none mb-1">Est. Price</div>
-          <div className="text-[17px] font-bold text-[#8eff8e] leading-none font-mono">{fmtPrice(pricing.totalPrice)}</div>
-        </div>
-      </div>
-
-      {/* Mode indicator */}
-      <div
-        className={`px-3 py-1.5 rounded-md text-[10px] text-center font-medium mb-3 ${
-          hasImageData()
-            ? 'bg-[#2d4a3d] text-[#4ade80]'
-            : 'bg-[#3a3a52] text-[#7c9bff]'
-        }`}
-      >
-        Mode: {hasImageData() ? 'Image Pattern' : 'Wave Pattern'}
-      </div>
-
       {/* Image Upload */}
       <Section title="Profile Image (Optional)">
         <div

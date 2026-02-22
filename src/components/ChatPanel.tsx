@@ -476,21 +476,22 @@ export default function ChatPanel({
           )}
         </div>
 
-        {/* Input */}
-        <div className="p-4 px-6 border-t border-[#3a3a42]">
+        {/* Input — primary interaction */}
+        <div className="p-4 px-6 border-t border-[#4a4a55] bg-[#2e2e36]">
+          <div className="text-[10px] text-[#888] mb-2 uppercase tracking-wider font-medium">Describe your wall</div>
           <div className="flex gap-2">
             <textarea
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder="Describe your rib wall..."
-              rows={2}
-              className="flex-1 px-3 py-2.5 bg-[#1a1a1f] border border-[#3a3a42] rounded-lg text-white text-[13px] resize-none outline-none font-[inherit]"
+              placeholder="e.g. &quot;60 deep ribs with red LEDs&quot; or &quot;dramatic lobby wall under $25K&quot;"
+              rows={3}
+              className="flex-1 px-4 py-3 bg-[#1a1a1f] border border-[#4a4a55] rounded-xl text-white text-[14px] leading-relaxed resize-none outline-none font-[inherit] focus:border-[#7c9bff] transition-colors placeholder:text-[#666]"
             />
             <button
               onClick={sendMessage}
               disabled={loading || !input.trim()}
-              className={`px-5 py-2.5 border-none rounded-lg text-[13px] font-semibold text-white self-end ${
+              className={`px-5 py-3 border-none rounded-xl text-[14px] font-semibold text-white self-end ${
                 loading || !input.trim()
                   ? 'bg-[#555] cursor-default'
                   : 'bg-[#7c9bff] cursor-pointer hover:bg-[#6b8aee]'
