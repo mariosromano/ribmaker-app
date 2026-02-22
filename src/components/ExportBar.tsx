@@ -47,8 +47,8 @@ export default function ExportBar({
   }, [params, installationMode, ledEnabled]);
 
   return (
-    <div className="bg-[#3a3a42] rounded-lg p-4 mb-3.5">
-      <div className="text-xs font-semibold text-[#aaa] uppercase tracking-wide mb-3">Export</div>
+    <div className="bg-[#3a3a42] rounded-lg p-4 mb-3">
+      <div className="text-[11px] font-semibold text-[#aaa] uppercase tracking-wider mb-2.5">Export</div>
       <div className="space-y-1.5">
         <button
           className="w-full py-2.5 rounded-md bg-[#7c9bff] hover:bg-[#6b8aee] text-white text-xs font-medium transition-colors"

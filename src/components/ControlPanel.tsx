@@ -48,15 +48,15 @@ function Section({
 }) {
   const [open, setOpen] = useState(defaultOpen);
   return (
-    <div className="bg-[#3a3a42] rounded-lg mb-3.5">
+    <div className="bg-[#3a3a42] rounded-lg mb-3">
       <button
-        className="w-full flex items-center justify-between px-4 py-3 text-left"
+        className="w-full flex items-center justify-between px-4 py-2.5 text-left"
         onClick={() => setOpen(!open)}
       >
-        <span className="text-xs font-semibold text-[#aaa] uppercase tracking-wide">{title}</span>
-        <span className="text-[#666] text-xs">{open ? '▲' : '▼'}</span>
+        <span className="text-[11px] font-semibold text-[#aaa] uppercase tracking-wider">{title}</span>
+        <span className="text-[#666] text-[10px]">{open ? '▲' : '▼'}</span>
       </button>
-      {open && <div className="px-4 pb-4">{children}</div>}
+      {open && <div className="px-4 pb-3.5 pt-0.5">{children}</div>}
     </div>
   );
 }
@@ -81,10 +81,10 @@ function Slider({
   info?: string;
 }) {
   return (
-    <div className="mb-3 last:mb-0">
-      <label className="flex justify-between mb-1.5 text-xs text-[#ccc]">
-        {label}
-        <span className="text-[#7c9bff] font-medium font-mono">
+    <div className="mb-2.5 last:mb-0">
+      <label className="flex justify-between mb-1 text-[11px] text-[#ccc]">
+        <span className="truncate mr-2">{label}</span>
+        <span className="text-[#7c9bff] font-medium font-mono shrink-0">
           {format ? format(value) : value}
         </span>
       </label>
@@ -96,7 +96,7 @@ function Slider({
         value={value}
         onChange={(e) => onChange(parseFloat(e.target.value))}
       />
-      {info && <p className="text-[10px] text-[#666] mt-1">{info}</p>}
+      {info && <p className="text-[10px] text-[#666] mt-0.5">{info}</p>}
     </div>
   );
 }
@@ -209,27 +209,23 @@ export default function ControlPanel(props: ControlPanelProps) {
 
   return (
     <div>
-      {/* Brand */}
-      <div className="flex items-center gap-2.5 mb-1.5">
-        <div className="text-[22px] font-bold tracking-tight">
-          M<span className="text-[#7c9bff] mx-0.5">|</span>R Walls
-        </div>
-      </div>
-      <div className="flex items-center justify-between">
+      {/* Brand + Price */}
+      <div className="flex items-start justify-between mb-1">
         <div>
-          <h1 className="text-[15px] font-medium text-[#aaa]">Rib Maker</h1>
-          <p className="text-[11px] text-[#666]">Architectural facade panel designer</p>
+          <div className="text-[20px] font-bold tracking-tight leading-tight">
+            M<span className="text-[#7c9bff] mx-0.5">|</span>R Walls
+          </div>
+          <div className="text-[13px] font-medium text-[#aaa] mt-0.5">Rib Maker</div>
         </div>
-        <div className="bg-[#2d4a2d] rounded-lg px-3 py-2 text-right">
-          <div className="text-[9px] text-[#8eff8e]/60 uppercase tracking-wide leading-none mb-1">Est. Price</div>
+        <div className="bg-[#2d4a2d] rounded-lg px-3 py-2 text-right shrink-0 ml-3">
+          <div className="text-[8px] text-[#8eff8e]/60 uppercase tracking-wider leading-none mb-1">Est. Price</div>
           <div className="text-[17px] font-bold text-[#8eff8e] leading-none font-mono">{fmtPrice(pricing.totalPrice)}</div>
         </div>
       </div>
-      <div className="mb-4" />
 
       {/* Mode indicator */}
       <div
-        className={`px-3 py-2 rounded-md text-[11px] text-center font-medium mb-3.5 ${
+        className={`px-3 py-1.5 rounded-md text-[10px] text-center font-medium mb-3 ${
           hasImageData()
             ? 'bg-[#2d4a3d] text-[#4ade80]'
             : 'bg-[#3a3a52] text-[#7c9bff]'
@@ -275,7 +271,7 @@ export default function ControlPanel(props: ControlPanelProps) {
             Clear Image
           </button>
         )}
-        {imagePreviewSrc && (
+        {hasImageData() && (
           <div className="mt-3">
             <Slider
               label="Image Scale"
@@ -566,8 +562,8 @@ export default function ControlPanel(props: ControlPanelProps) {
       </Section>
 
       {/* Controls info */}
-      <div className="bg-[#1a1a1f] rounded-md p-2.5 mt-3.5 text-[11px] text-[#666] leading-relaxed">
-        <strong className="text-[#aaa]">Controls:</strong> Left-click drag to rotate, right-click drag to pan, scroll to zoom.
+      <div className="bg-[#1a1a1f] rounded-md p-2.5 mt-3 text-[10px] text-[#666] leading-relaxed">
+        <strong className="text-[#999]">Controls:</strong> Left-click drag to rotate, right-click to pan, scroll to zoom.
       </div>
     </div>
   );

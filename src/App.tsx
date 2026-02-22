@@ -103,7 +103,7 @@ export default function App() {
       />
 
       {/* Right: Control Panel + Export + Info */}
-      <div className="w-[340px] min-w-[340px] bg-[#2a2a30] h-screen overflow-y-auto py-5 pl-5 pr-6 flex flex-col">
+      <div className="w-[340px] min-w-[340px] bg-[#2a2a30] h-screen overflow-y-auto py-5 px-6 flex flex-col">
         <div className="flex-1">
           <ControlPanel
             params={params}
