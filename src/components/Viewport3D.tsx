@@ -26,6 +26,7 @@ interface Viewport3DProps {
   backdropColor: string;
   bgColor: string;
   floorEnabled: boolean;
+  wallpaperEnabled: boolean;
   scaleFigureEnabled: boolean;
   imageScale: number;
   onRibProfilesGenerated: (profiles: RibProfile[]) => void;
@@ -45,6 +46,7 @@ export default function Viewport3D({
   backdropColor,
   bgColor,
   floorEnabled,
+  wallpaperEnabled,
   scaleFigureEnabled,
   imageScale,
   onRibProfilesGenerated,
@@ -65,6 +67,7 @@ export default function Viewport3D({
   const floorMeshRef = useRef<THREE.Mesh | null>(null);
   const scaleFigureRef = useRef<THREE.Mesh | null>(null);
   const animFrameRef = useRef<number>(0);
+  const wallpaperTextureRef = useRef<THREE.Texture | null>(null);
   const initializedRef = useRef(false);
 
   // Initialize Three.js scene
@@ -292,11 +295,27 @@ export default function Viewport3D({
 
     // Wall/ceiling backdrop
     const backdropMat = new THREE.MeshStandardMaterial({
-      color: new THREE.Color(backdropColor),
+      color: wallpaperEnabled ? 0xffffff : new THREE.Color(backdropColor),
       side: THREE.DoubleSide,
       roughness: 0.7,
       metalness: 0.0,
     });
+
+    if (wallpaperEnabled) {
+      if (!wallpaperTextureRef.current) {
+        const loader = new THREE.TextureLoader();
+        loader.load('/wallpapers/bluewallpaper.png', (tex) => {
+          tex.colorSpace = THREE.SRGBColorSpace;
+          tex.wrapS = THREE.ClampToEdgeWrapping;
+          tex.wrapT = THREE.ClampToEdgeWrapping;
+          wallpaperTextureRef.current = tex;
+          backdropMat.map = tex;
+          backdropMat.needsUpdate = true;
+        });
+      } else {
+        backdropMat.map = wallpaperTextureRef.current;
+      }
+    }
 
     if (installationMode === 'wall') {
       const wallGeo = new THREE.PlaneGeometry((totalWidth + 40) * SCALE, (height + 10) * SCALE);
@@ -365,7 +384,7 @@ export default function Viewport3D({
     }
 
     onRibProfilesGenerated(ribProfiles);
-  }, [params, installationMode, imageScale, backdropColor, ledEnabled, ledColorStart, ledColorEnd, ledIntensity]);
+  }, [params, installationMode, imageScale, backdropColor, wallpaperEnabled, ledEnabled, ledColorStart, ledColorEnd, ledIntensity]);
 
   // ── Lighting ──
   useEffect(() => {

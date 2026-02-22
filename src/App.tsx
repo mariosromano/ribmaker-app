@@ -39,6 +39,7 @@ export default function App() {
   const [backdropColor, setBackdropColor] = useState('#3a3a40');
   const [bgColor, setBgColor] = useState('#1a1a1f');
   const [floorEnabled, setFloorEnabled] = useState(true);
+  const [wallpaperEnabled, setWallpaperEnabled] = useState(false);
   const [scaleFigureEnabled, setScaleFigureEnabled] = useState(false);
   const [imageScale, setImageScale] = useState(1.0);
   const [ribProfiles, setRibProfiles] = useState<RibProfile[]>([]);
@@ -92,6 +93,7 @@ export default function App() {
         backdropColor={backdropColor}
         bgColor={bgColor}
         floorEnabled={floorEnabled}
+        wallpaperEnabled={wallpaperEnabled}
         scaleFigureEnabled={scaleFigureEnabled}
         imageScale={imageScale}
         onRibProfilesGenerated={handleRibProfilesGenerated}
@@ -124,6 +126,8 @@ export default function App() {
             onBgColorChange={setBgColor}
             floorEnabled={floorEnabled}
             onFloorEnabledChange={setFloorEnabled}
+            wallpaperEnabled={wallpaperEnabled}
+            onWallpaperEnabledChange={setWallpaperEnabled}
             scaleFigureEnabled={scaleFigureEnabled}
             onScaleFigureEnabledChange={setScaleFigureEnabled}
             imageScale={imageScale}

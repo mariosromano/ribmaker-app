@@ -28,6 +28,8 @@ interface ControlPanelProps {
   onBgColorChange: (color: string) => void;
   floorEnabled: boolean;
   onFloorEnabledChange: (enabled: boolean) => void;
+  wallpaperEnabled: boolean;
+  onWallpaperEnabledChange: (enabled: boolean) => void;
   scaleFigureEnabled: boolean;
   onScaleFigureEnabledChange: (enabled: boolean) => void;
   imageScale: number;
@@ -147,6 +149,8 @@ export default function ControlPanel(props: ControlPanelProps) {
     onBgColorChange,
     floorEnabled,
     onFloorEnabledChange,
+    wallpaperEnabled,
+    onWallpaperEnabledChange,
     scaleFigureEnabled,
     onScaleFigureEnabledChange,
     imageScale,
@@ -466,14 +470,24 @@ export default function ControlPanel(props: ControlPanelProps) {
           />
         </div>
         <div className="mb-3">
-          <label className="block mb-1.5 text-xs text-[#ccc]">Wall/Ceiling Color</label>
-          <input
-            type="color"
-            className="w-full h-9 border-none rounded cursor-pointer bg-transparent"
-            value={backdropColor}
-            onChange={(e) => onBackdropColorChange(e.target.value)}
-          />
+          <Toggle label="Wallpaper" checked={wallpaperEnabled} onChange={onWallpaperEnabledChange} />
+          {wallpaperEnabled && (
+            <div className="rounded-md overflow-hidden border border-[#555] mt-1">
+              <img src="/wallpapers/bluewallpaper.png" alt="Wallpaper" className="w-full h-14 object-cover" />
+            </div>
+          )}
         </div>
+        {!wallpaperEnabled && (
+          <div className="mb-3">
+            <label className="block mb-1.5 text-xs text-[#ccc]">Wall/Ceiling Color</label>
+            <input
+              type="color"
+              className="w-full h-9 border-none rounded cursor-pointer bg-transparent"
+              value={backdropColor}
+              onChange={(e) => onBackdropColorChange(e.target.value)}
+            />
+          </div>
+        )}
         <div className="mb-3">
           <label className="block mb-1.5 text-xs text-[#ccc]">Background Color</label>
           <input
