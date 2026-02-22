@@ -27,7 +27,7 @@ export default async function handler(req, res) {
           prompt:
             prompt ||
             "White Corian ribs, realistic architectural photography, luxury interior, accent lighting, keep exact rib geometry and scale, high detail, 8K",
-          image_urls: [`data:image/png;base64,${image}`],
+          image_urls: [`data:image/jpeg;base64,${image}`],
           num_images: 1,
           aspect_ratio: "auto",
           output_format: "png",

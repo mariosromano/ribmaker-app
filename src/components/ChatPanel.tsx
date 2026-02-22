@@ -160,7 +160,7 @@ export default function ChatPanel({
     [onImageModeChange]
   );
 
-  // Capture screenshot from Three.js renderer
+  // Capture screenshot from Three.js renderer (downscaled JPEG to stay under Vercel 4.5MB limit)
   const captureScreenshot = useCallback((): string | null => {
     const renderer = rendererRef.current;
     const scene = sceneRef.current;
@@ -168,7 +168,24 @@ export default function ChatPanel({
     if (!renderer || !scene || !camera) return null;
 
     renderer.render(scene, camera);
-    return renderer.domElement.toDataURL('image/png');
+
+    // Downscale to max 1536px on longest side and use JPEG for smaller payload
+    const canvas = renderer.domElement;
+    const maxDim = 1536;
+    let w = canvas.width;
+    let h = canvas.height;
+    if (w > maxDim || h > maxDim) {
+      const ratio = maxDim / Math.max(w, h);
+      w = Math.round(w * ratio);
+      h = Math.round(h * ratio);
+    }
+    const offscreen = document.createElement('canvas');
+    offscreen.width = w;
+    offscreen.height = h;
+    const ctx = offscreen.getContext('2d');
+    if (!ctx) return canvas.toDataURL('image/jpeg', 0.85);
+    ctx.drawImage(canvas, 0, 0, w, h);
+    return offscreen.toDataURL('image/jpeg', 0.85);
   }, [rendererRef, sceneRef, cameraRef]);
 
   // FAL render
@@ -186,7 +203,7 @@ export default function ChatPanel({
       const dataUrl = captureScreenshot();
       if (!dataUrl) throw new Error('Could not capture screenshot');
 
-      const base64 = dataUrl.replace(/^data:image\/png;base64,/, '');
+      const base64 = dataUrl.replace(/^data:image\/[a-z]+;base64,/, '');
 
       const renderHeaders: Record<string, string> = { 'Content-Type': 'application/json' };
       if (falKey) renderHeaders['x-fal-key'] = falKey;
@@ -197,7 +214,13 @@ export default function ChatPanel({
         body: JSON.stringify({ image: base64, prompt: scenePrompt }),
       });
 
-      const data = await res.json();
+      const text = await res.text();
+      let data: any;
+      try {
+        data = JSON.parse(text);
+      } catch {
+        throw new Error(`Server error (${res.status}): ${text.slice(0, 120)}`);
+      }
       if (!res.ok) throw new Error(data.error || 'Render failed');
 
       setRenderResult(data.imageUrl);
