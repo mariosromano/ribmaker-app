@@ -288,7 +288,7 @@ export default function ChatPanel({
     <>
       <div className="w-[380px] min-w-[380px] flex flex-col bg-[#2a2a30] border-r border-[#3a3a42] h-screen">
         {/* Header + API Keys */}
-        <div className="p-3 px-4 border-b border-[#3a3a42]">
+        <div className="p-3 px-5 border-b border-[#3a3a42]">
           <div className="text-lg font-bold text-white mb-2">
             M<span className="text-[#7c9bff]">|</span>R Walls
           </div>
@@ -313,7 +313,7 @@ export default function ChatPanel({
         </div>
 
         {/* How to Use */}
-        <div className="px-4 pt-2">
+        <div className="px-5 pt-2">
           <button
             onClick={() => setShowAbout(!showAbout)}
             className={`w-full py-1.5 border rounded-md text-[11px] cursor-pointer font-medium transition-colors ${
@@ -346,7 +346,7 @@ export default function ChatPanel({
         </div>
 
         {/* Messages */}
-        <div className="flex-1 overflow-y-auto px-4 py-3">
+        <div className="flex-1 overflow-y-auto px-5 py-3">
           {messages.map((msg, i) => (
             <div
               key={i}
@@ -390,7 +390,7 @@ export default function ChatPanel({
         </div>
 
         {/* Pattern Grid */}
-        <div className="px-4">
+        <div className="px-5">
           <button
             onClick={() => setShowPatterns(!showPatterns)}
             className="w-full py-2 bg-transparent border border-[#555] rounded-md text-[#888] text-[11px] cursor-pointer mb-1"
@@ -418,7 +418,7 @@ export default function ChatPanel({
         </div>
 
         {/* Render Panel */}
-        <div className="px-4 pt-1">
+        <div className="px-5 pt-1">
           <button
             onClick={() => setShowRenderPanel(!showRenderPanel)}
             className={`w-full py-2 border rounded-md text-[11px] cursor-pointer font-semibold transition-colors ${
@@ -454,7 +454,7 @@ export default function ChatPanel({
         </div>
 
         {/* Input */}
-        <div className="p-3 px-4 border-t border-[#3a3a42]">
+        <div className="p-3 px-5 border-t border-[#3a3a42]">
           <div className="flex gap-2">
             <textarea
               value={input}

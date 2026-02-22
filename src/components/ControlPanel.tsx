@@ -1,11 +1,11 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import type {
   RibParams,
   InstallationMode,
   LightingPreset,
 } from '../engine/types';
 import { WAVE_TYPES } from '../engine/types';
-import { loadImageData, clearImageData, hasImageData } from '../engine/ribEngine';
+import { loadImageData, clearImageData, hasImageData, calculatePricing } from '../engine/ribEngine';
 
 interface ControlPanelProps {
   params: RibParams;
@@ -192,6 +192,14 @@ export default function ControlPanel(props: ControlPanelProps) {
     [handleImageUpload]
   );
 
+  const pricing = useMemo(
+    () => calculatePricing(params, installationMode, ledEnabled),
+    [params, installationMode, ledEnabled]
+  );
+
+  const fmtPrice = (n: number) =>
+    '$' + n.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+
   const curveControlSpacing = params.height / (params.controlPoints - 1);
   const curveSegmentSize = params.height / params.displayResolution;
 
@@ -203,8 +211,17 @@ export default function ControlPanel(props: ControlPanelProps) {
           M<span className="text-[#7c9bff] mx-0.5">|</span>R Walls
         </div>
       </div>
-      <h1 className="text-[15px] font-medium text-[#aaa]">Rib Maker</h1>
-      <p className="text-[11px] text-[#666] mb-4">Architectural facade panel designer</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-[15px] font-medium text-[#aaa]">Rib Maker</h1>
+          <p className="text-[11px] text-[#666]">Architectural facade panel designer</p>
+        </div>
+        <div className="bg-[#2d4a2d] rounded-lg px-3 py-2 text-right">
+          <div className="text-[9px] text-[#8eff8e]/60 uppercase tracking-wide leading-none mb-1">Est. Price</div>
+          <div className="text-[17px] font-bold text-[#8eff8e] leading-none font-mono">{fmtPrice(pricing.totalPrice)}</div>
+        </div>
+      </div>
+      <div className="mb-4" />
 
       {/* Mode indicator */}
       <div
