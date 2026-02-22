@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef, useMemo } from 'react';
+import { useState, useCallback, useRef, useMemo, useEffect } from 'react';
 import * as THREE from 'three';
 import type {
   RibParams,
@@ -216,6 +216,23 @@ export default function App() {
   const [ribProfiles, setRibProfiles] = useState<RibProfile[]>([]);
   const [, setHasImage] = useState(false);
 
+  // First-time user onboarding state
+  const [isFirstTimeUser, setIsFirstTimeUser] = useState(false);
+  const [sidebarReady, setSidebarReady] = useState(true);
+
+  useEffect(() => {
+    const onboarded = localStorage.getItem('ribmaker_onboarded') === 'true';
+    setIsFirstTimeUser(!onboarded);
+    setSidebarReady(onboarded);
+  }, []);
+
+  const completeOnboarding = useCallback(() => {
+    setIsFirstTimeUser(false);
+    localStorage.setItem('ribmaker_onboarded', 'true');
+    // Delay sidebar slide-in slightly so the floating card fade-out finishes first
+    setTimeout(() => setSidebarReady(true), 50);
+  }, []);
+
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
   const sceneRef = useRef<THREE.Scene | null>(null);
   const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
@@ -250,6 +267,9 @@ export default function App() {
         rendererRef={rendererRef}
         sceneRef={sceneRef}
         cameraRef={cameraRef}
+        isFloating={isFirstTimeUser}
+        sidebarReady={sidebarReady}
+        onOnboardingComplete={completeOnboarding}
       />
 
       {/* Center: 3D Viewport — hero area */}

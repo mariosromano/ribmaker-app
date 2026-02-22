@@ -15,6 +15,12 @@ function getSavedKey(key: string): string {
   return localStorage.getItem(key) ?? '';
 }
 
+const SUGGESTIONS = [
+  'Dramatic lobby wall with 60 deep ribs and red LEDs',
+  'Minimal white ceiling ribs for a modern office',
+  'Organic flowing wall, budget $25K, warm sunset lighting',
+];
+
 interface ChatPanelProps {
   params: RibParams;
   onParamsChange: (params: RibParams) => void;
@@ -33,6 +39,9 @@ interface ChatPanelProps {
   rendererRef: React.MutableRefObject<THREE.WebGLRenderer | null>;
   sceneRef: React.MutableRefObject<THREE.Scene | null>;
   cameraRef: React.MutableRefObject<THREE.PerspectiveCamera | null>;
+  isFloating?: boolean;
+  sidebarReady?: boolean;
+  onOnboardingComplete?: () => void;
 }
 
 export default function ChatPanel({
@@ -53,6 +62,9 @@ export default function ChatPanel({
   rendererRef,
   sceneRef,
   cameraRef,
+  isFloating = false,
+  sidebarReady = true,
+  onOnboardingComplete,
 }: ChatPanelProps) {
   const [apiKey, setApiKey] = useState(() => getSavedKey('ribmaker_api_key'));
   const [falKey, setFalKey] = useState(() => getSavedKey('ribmaker_fal_key'));
@@ -76,8 +88,10 @@ export default function ChatPanel({
     'White Corian ribs, realistic architectural photography, accent lighting, keep exact rib geometry and scale'
   );
   const [renderResult, setRenderResult] = useState<string | null>(null);
+  const [floatingFadingOut, setFloatingFadingOut] = useState(false);
 
   const chatEndRef = useRef<HTMLDivElement>(null);
+  const floatingTextareaRef = useRef<HTMLTextAreaElement>(null);
 
   // Check if server has pre-configured keys
   useEffect(() => {
@@ -89,6 +103,13 @@ export default function ChatPanel({
       })
       .catch(() => {});
   }, []);
+
+  // Auto-focus floating textarea
+  useEffect(() => {
+    if (isFloating && !floatingFadingOut && floatingTextareaRef.current) {
+      floatingTextareaRef.current.focus();
+    }
+  }, [isFloating, floatingFadingOut]);
 
   // Save keys to localStorage
   const handleKeyChange = useCallback((val: string) => {
@@ -277,12 +298,21 @@ export default function ChatPanel({
           await loadPattern(data.patternImageUrl.replace('/patterns/', ''));
         }, 300);
       }
+
+      // Transition out of floating card after first successful response
+      if (isFloating && onOnboardingComplete) {
+        setFloatingFadingOut(true);
+        setTimeout(() => {
+          onOnboardingComplete();
+          setFloatingFadingOut(false);
+        }, 300);
+      }
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Unknown error');
     } finally {
       setLoading(false);
     }
-  }, [input, apiKey, serverHasAnthropicKey, messages, applyParams, loadPattern]);
+  }, [input, apiKey, serverHasAnthropicKey, messages, applyParams, loadPattern, isFloating, onOnboardingComplete]);
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
@@ -309,7 +339,112 @@ export default function ChatPanel({
 
   return (
     <>
-      <div className="w-[380px] min-w-[380px] flex flex-col bg-[#2a2a30] border-r border-[#3a3a42] h-screen">
+      {/* ── Floating Welcome Card (first-time users) ─────────────── */}
+      {isFloating && (
+        <div
+          className="fixed inset-0 z-[1000] flex items-center justify-center"
+          style={{
+            background: 'rgba(0,0,0,0.5)',
+            animation: floatingFadingOut
+              ? 'floatCardOut 0.3s ease-in forwards'
+              : 'floatCardIn 0.4s ease-out',
+          }}
+        >
+          <div className="w-[520px] max-w-[90vw] bg-[#2a2a30] rounded-2xl border border-[#3a3a42] p-8 shadow-[0_24px_80px_rgba(0,0,0,0.6)]">
+            {/* Branding */}
+            <div className="text-center mb-6">
+              <div className="text-[28px] font-bold text-white mb-2">
+                M<span className="text-[#7c9bff]">|</span>R Walls
+              </div>
+              <div className="text-[#999] text-sm leading-relaxed">
+                Describe the rib wall you want and the AI will configure it live.
+                <br />
+                Style, size, lighting, patterns, budget — just tell it what you need.
+              </div>
+            </div>
+
+            {/* API key input (only if server doesn't have key and user hasn't saved one) */}
+            {!serverHasAnthropicKey && !apiKey && (
+              <input
+                type="password"
+                placeholder="Anthropic API Key (sk-ant-...)"
+                value={apiKey}
+                onChange={(e) => handleKeyChange(e.target.value)}
+                className="w-full px-3.5 py-2.5 bg-[#1a1a1f] border border-[#3a3a42] rounded-lg text-[#ccc] text-[13px] mb-4 outline-none"
+              />
+            )}
+
+            {/* Suggestion chips */}
+            <div className="flex flex-col gap-2 mb-5">
+              {SUGGESTIONS.map((s, i) => (
+                <button
+                  key={i}
+                  onClick={() => setInput(s)}
+                  className="px-3.5 py-2.5 rounded-lg text-[13px] cursor-pointer text-left transition-all"
+                  style={{
+                    background: input === s ? '#3a3a52' : '#1a1a1f',
+                    border: `1px solid ${input === s ? '#7c9bff' : '#3a3a42'}`,
+                    color: input === s ? '#7c9bff' : '#bbb',
+                  }}
+                >
+                  {s}
+                </button>
+              ))}
+            </div>
+
+            {/* Chat input */}
+            <div className="flex gap-2">
+              <textarea
+                ref={floatingTextareaRef}
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyDown={handleKeyDown}
+                placeholder="Describe your rib wall..."
+                rows={3}
+                className="flex-1 px-3.5 py-3 bg-[#1a1a1f] border border-[#3a3a42] rounded-lg text-white text-[14px] resize-none outline-none font-[inherit] focus:border-[#7c9bff] transition-colors placeholder:text-[#666]"
+              />
+              <button
+                onClick={sendMessage}
+                disabled={loading || !input.trim()}
+                className={`px-6 py-3 border-none rounded-lg text-[14px] font-semibold text-white self-end ${
+                  loading || !input.trim()
+                    ? 'bg-[#555] cursor-default'
+                    : 'bg-[#7c9bff] cursor-pointer hover:bg-[#6b8aee]'
+                }`}
+              >
+                {loading ? '...' : 'Send'}
+              </button>
+            </div>
+
+            {/* Loading state */}
+            {loading && (
+              <div className="text-center text-[#7c9bff] text-[13px] mt-4">
+                Configuring your rib wall...
+              </div>
+            )}
+
+            {/* Error state */}
+            {error && (
+              <div className="px-3 py-2 rounded-lg bg-[#4a2a2a] text-[#ff6b6b] text-xs mt-3">
+                {error}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* ── Sidebar Chat Panel ─────────────────────────────────────── */}
+      <div
+        className="flex flex-col bg-[#2a2a30] border-r border-[#3a3a42] h-screen"
+        style={{
+          width: sidebarReady ? 380 : 0,
+          minWidth: sidebarReady ? 380 : 0,
+          opacity: sidebarReady ? 1 : 0,
+          overflow: sidebarReady ? undefined : 'hidden',
+          borderRight: sidebarReady ? undefined : 'none',
+          transition: 'width 0.5s ease, min-width 0.5s ease, opacity 0.5s ease',
+        }}
+      >
         {/* Header + API Keys */}
         <div className="p-4 px-6 border-b border-[#3a3a42]">
           <div className="text-lg font-bold text-white mb-2">

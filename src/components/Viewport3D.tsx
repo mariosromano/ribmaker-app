@@ -260,7 +260,7 @@ export default function Viewport3D({
     if (ceilingMeshRef.current) { ribGroup.remove(ceilingMeshRef.current); ceilingMeshRef.current = null; }
     clearLEDs();
 
-    const { height, thickness, count, spacing, displayResolution, color, maxDepth } = params;
+    const { height, thickness, count, spacing, color } = params;
 
     const actualMinDepth = Math.min(params.minDepth, params.maxDepth);
     const actualMaxDepth = Math.max(params.minDepth, params.maxDepth);
