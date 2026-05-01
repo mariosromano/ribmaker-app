@@ -1,7 +1,6 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import * as THREE from 'three';
 import type { RibParams, InstallationMode, LightingPreset } from '../engine/types';
-import { PATTERNS } from '../engine/patterns';
 import { loadImageFromUrl } from '../engine/ribEngine';
 
 interface ChatMessage {
@@ -86,7 +85,6 @@ export default function ChatPanel({
   ]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [showPatterns, setShowPatterns] = useState(false);
   const [showAbout, setShowAbout] = useState(false);
   const [showRenderPanel, setShowRenderPanel] = useState(false);
   const [rendering, setRendering] = useState(false);
@@ -338,19 +336,6 @@ export default function ChatPanel({
     [sendMessage]
   );
 
-  const handlePatternClick = useCallback(
-    (pattern: (typeof PATTERNS)[number]) => {
-      loadPattern(pattern.file);
-      setShowPatterns(false);
-      setMessages((prev) => [
-        ...prev,
-        { role: 'user', content: `Apply ${pattern.name} pattern` },
-        { role: 'assistant', content: `Applied the ${pattern.name} pattern. The rib depths are now driven by the image brightness.` },
-      ]);
-    },
-    [loadPattern]
-  );
-
   return (
     <>
       {/* ── Floating Welcome Card (first-time users) ─────────────── */}
@@ -587,34 +572,6 @@ export default function ChatPanel({
             </div>
           )}
           <div ref={chatEndRef} />
-        </div>
-
-        {/* Pattern Grid */}
-        <div className="px-6">
-          <button
-            onClick={() => setShowPatterns(!showPatterns)}
-            className="w-full py-2 bg-transparent border border-[#555] rounded-md text-[#888] text-[11px] cursor-pointer mb-1"
-          >
-            {showPatterns ? 'Hide Patterns' : 'Browse Patterns'}
-          </button>
-          {showPatterns && (
-            <div className="grid grid-cols-3 gap-1.5 max-h-[200px] overflow-y-auto pb-2">
-              {PATTERNS.map((p) => (
-                <button
-                  key={p.id}
-                  onClick={() => handlePatternClick(p)}
-                  className="p-1 bg-[#1a1a1f] border border-[#3a3a42] rounded cursor-pointer text-center hover:border-[#7c9bff] transition-colors"
-                >
-                  <img
-                    src={`/patterns/${p.file}`}
-                    alt={p.name}
-                    className="w-full h-[50px] object-cover rounded-sm"
-                  />
-                  <div className="text-[9px] text-[#888] mt-0.5 truncate">{p.name}</div>
-                </button>
-              ))}
-            </div>
-          )}
         </div>
 
         {/* Render Panel */}
