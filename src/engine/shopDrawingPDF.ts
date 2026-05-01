@@ -40,9 +40,9 @@ function drawElevationView(
   pdf.setFont('helvetica', 'bold');
   pdf.text('ELEVATION  ·  FRONT VIEW', x + w / 2, y + 0.15, { align: 'center' });
 
-  // Inner area for the drawing (leave space for dim lines)
-  const padTop = 0.45;
-  const padBottom = 0.55;
+  // Inner area for the drawing (title bar + clear room for top dim line + label)
+  const padTop = 0.7;
+  const padBottom = 0.65;
   const padLeft = 0.65;
   const padRight = 0.4;
   const innerX = x + padLeft;
@@ -82,10 +82,6 @@ function drawElevationView(
   pdf.setTextColor(50);
   pdf.setFont('helvetica', 'bold');
   pdf.text(fmtFt(totalLen), ox + drawW / 2, dimY - 0.06, { align: 'center' });
-  pdf.setFont('helvetica', 'normal');
-  pdf.setFontSize(6.5);
-  pdf.setTextColor(120);
-  pdf.text('TOTAL WALL LENGTH', ox + drawW / 2, dimY - 0.18, { align: 'center' });
 
   // Left dimension — wall height
   const ddX = ox - 0.22;
@@ -137,8 +133,8 @@ function drawPlanView(
   pdf.setFont('helvetica', 'bold');
   pdf.text('PLAN  ·  TOP VIEW', x + w / 2, y + 0.15, { align: 'center' });
 
-  const padTop = 0.45;
-  const padBottom = 0.55;
+  const padTop = 0.7;
+  const padBottom = 0.65;
   const padLeft = 0.65;
   const padRight = 0.4;
   const innerX = x + padLeft;
@@ -194,10 +190,6 @@ function drawPlanView(
   pdf.setTextColor(50);
   pdf.setFont('helvetica', 'bold');
   pdf.text(`${params.maxDepth}"`, ddX - 0.07, oy + drawH / 2, { align: 'right', angle: 90 });
-  pdf.setFontSize(6.5);
-  pdf.setTextColor(120);
-  pdf.setFont('helvetica', 'normal');
-  pdf.text('MAX DEPTH', ddX - 0.18, oy + drawH / 2, { align: 'right', angle: 90 });
 
   // Bottom callout — depth range
   pdf.setFontSize(7);
@@ -242,37 +234,16 @@ export async function exportRibShopDrawingPDF(
 
   // ─── Pricing strip (right of title block top edge) ──────────────
   const pricingX = pageW - margin - 0.1;
-  const pricingY = tbY - 0.12;
-
-  const pricingLines: [string, number][] = [
-    ['Corian Ribs (incl. CNC)', pricing.ribPrice],
-  ];
-  if (ledEnabled) pricingLines.push(['LED Strip Lighting', pricing.ledPrice]);
-
-  let py = pricingY - 0.34 - pricingLines.length * 0.16;
-  for (const [label, cost] of pricingLines) {
-    pdf.setTextColor(90);
-    pdf.setFontSize(8);
-    pdf.setFont('helvetica', 'normal');
-    pdf.text(label, pricingX - 1.6, py, { align: 'right' });
-    pdf.setTextColor(30);
-    pdf.setFont('helvetica', 'bold');
-    pdf.text(fmtUSD(cost), pricingX, py, { align: 'right' });
-    py += 0.16;
-  }
-
-  pdf.setDrawColor(150);
-  pdf.setLineWidth(0.01);
-  pdf.line(pricingX - 2.0, py - 0.06, pricingX, py - 0.06);
-
-  pdf.setFontSize(7);
-  pdf.setTextColor(120);
+  // Single clean line: "Estimated Total" + amount, right-aligned
+  const pricingY = tbY - 0.18;
   pdf.setFont('helvetica', 'normal');
-  pdf.text('ESTIMATED TOTAL', pricingX - 1.6, py + 0.05, { align: 'right' });
+  pdf.setFontSize(9);
+  pdf.setTextColor(110);
+  pdf.text('Estimated Total', pricingX - 1.6, pricingY, { align: 'right' });
   pdf.setFont('helvetica', 'bold');
-  pdf.setFontSize(15);
+  pdf.setFontSize(16);
   pdf.setTextColor(20);
-  pdf.text(fmtUSD(pricing.totalPrice), pricingX, py + 0.11, { align: 'right' });
+  pdf.text(fmtUSD(pricing.totalPrice), pricingX, pricingY + 0.02, { align: 'right' });
 
   // ─── Title block (4 columns) ─────────────────────────────────────
   pdf.setDrawColor(50);
