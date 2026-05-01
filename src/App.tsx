@@ -247,69 +247,77 @@ export default function App() {
         cameraRef={cameraRef}
       />
 
-      {/* Right: Summary + Advanced Controls + Export + Info, with Ask Mara drawer overlay */}
-      <div className="relative overflow-hidden" style={{ width: 340 }}>
-        <RightPanel
-          params={params}
-          onParamsChange={setParams}
-          installationMode={installationMode}
-          onInstallationModeChange={setInstallationMode}
-          lightingPreset={lightingPreset}
-          onLightingPresetChange={setLightingPreset}
-          ledEnabled={ledEnabled}
-          onLedEnabledChange={setLedEnabled}
-          ledColorStart={ledColorStart}
-          onLedColorStartChange={setLedColorStart}
-          ledColorEnd={ledColorEnd}
-          onLedColorEndChange={setLedColorEnd}
-          ledIntensity={ledIntensity}
-          onLedIntensityChange={setLedIntensity}
-          backdropColor={backdropColor}
-          onBackdropColorChange={setBackdropColor}
-          bgColor={bgColor}
-          onBgColorChange={setBgColor}
-          floorEnabled={floorEnabled}
-          onFloorEnabledChange={setFloorEnabled}
-          wallpaperEnabled={wallpaperEnabled}
-          onWallpaperEnabledChange={setWallpaperEnabled}
-          scaleFigureEnabled={scaleFigureEnabled}
-          onScaleFigureEnabledChange={setScaleFigureEnabled}
-          imageScale={imageScale}
-          onImageScaleChange={setImageScale}
-          onImageModeChange={handleImageModeChange}
-          ribProfiles={ribProfiles}
-          rendererRef={rendererRef}
-          sceneRef={sceneRef}
-          cameraRef={cameraRef}
-          onOpenAskMara={() => setAskMaraOpen(true)}
-        />
+      {/* Right: Controls panel — always visible */}
+      <RightPanel
+        params={params}
+        onParamsChange={setParams}
+        installationMode={installationMode}
+        onInstallationModeChange={setInstallationMode}
+        lightingPreset={lightingPreset}
+        onLightingPresetChange={setLightingPreset}
+        ledEnabled={ledEnabled}
+        onLedEnabledChange={setLedEnabled}
+        ledColorStart={ledColorStart}
+        onLedColorStartChange={setLedColorStart}
+        ledColorEnd={ledColorEnd}
+        onLedColorEndChange={setLedColorEnd}
+        ledIntensity={ledIntensity}
+        onLedIntensityChange={setLedIntensity}
+        backdropColor={backdropColor}
+        onBackdropColorChange={setBackdropColor}
+        bgColor={bgColor}
+        onBgColorChange={setBgColor}
+        floorEnabled={floorEnabled}
+        onFloorEnabledChange={setFloorEnabled}
+        wallpaperEnabled={wallpaperEnabled}
+        onWallpaperEnabledChange={setWallpaperEnabled}
+        scaleFigureEnabled={scaleFigureEnabled}
+        onScaleFigureEnabledChange={setScaleFigureEnabled}
+        imageScale={imageScale}
+        onImageScaleChange={setImageScale}
+        onImageModeChange={handleImageModeChange}
+        ribProfiles={ribProfiles}
+        rendererRef={rendererRef}
+        sceneRef={sceneRef}
+        cameraRef={cameraRef}
+        onOpenAskMara={() => setAskMaraOpen(true)}
+      />
 
-        {/* Ask Mara drawer — slides over RightPanel */}
-        <ChatPanel
-          params={params}
-          onParamsChange={setParams}
-          onInstallationModeChange={setInstallationMode}
-          onLightingPresetChange={setLightingPreset}
-          onLedEnabledChange={setLedEnabled}
-          onLedColorStartChange={setLedColorStart}
-          onLedColorEndChange={setLedColorEnd}
-          onLedIntensityChange={setLedIntensity}
-          onBackdropColorChange={setBackdropColor}
-          onBgColorChange={setBgColor}
-          onImageScaleChange={setImageScale}
-          onImageModeChange={handleImageModeChange}
-          onScaleFigureEnabledChange={setScaleFigureEnabled}
-          onFloorEnabledChange={setFloorEnabled}
-          rendererRef={rendererRef}
-          sceneRef={sceneRef}
-          cameraRef={cameraRef}
-          isFloating={false}
-          sidebarReady={true}
-          isDrawer
-          isOpen={askMaraOpen}
-          onClose={() => setAskMaraOpen(false)}
-        />
-      </div>
+      {/* Ask Mara drawer — fixed overlay, only mounted when open */}
+      {askMaraOpen && (
+        <>
+          <div
+            className="fixed inset-0 bg-black/40 z-40"
+            onClick={() => setAskMaraOpen(false)}
+          />
+          <div className="fixed top-0 right-0 h-screen z-50" style={{ width: 380 }}>
+            <ChatPanel
+              params={params}
+              onParamsChange={setParams}
+              onInstallationModeChange={setInstallationMode}
+              onLightingPresetChange={setLightingPreset}
+              onLedEnabledChange={setLedEnabled}
+              onLedColorStartChange={setLedColorStart}
+              onLedColorEndChange={setLedColorEnd}
+              onLedIntensityChange={setLedIntensity}
+              onBackdropColorChange={setBackdropColor}
+              onBgColorChange={setBgColor}
+              onImageScaleChange={setImageScale}
+              onImageModeChange={handleImageModeChange}
+              onScaleFigureEnabledChange={setScaleFigureEnabled}
+              onFloorEnabledChange={setFloorEnabled}
+              rendererRef={rendererRef}
+              sceneRef={sceneRef}
+              cameraRef={cameraRef}
+              isFloating={false}
+              sidebarReady={true}
+              isDrawer
+              isOpen={true}
+              onClose={() => setAskMaraOpen(false)}
+            />
+          </div>
+        </>
+      )}
     </div>
   );
 }
