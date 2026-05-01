@@ -91,8 +91,8 @@ function RightPanel(props: RightPanelProps) {
         {/* Brand + Price (always visible) */}
         <div className="flex items-start justify-between mb-3">
           <div>
-            <div className="text-[20px] font-bold tracking-tight leading-tight">
-              M<span className="text-[#7c9bff] mx-0.5">|</span>R Walls
+            <div className="text-[20px] font-bold tracking-tight leading-tight text-[#d4af37]">
+              MAKE REAL
             </div>
             <div className="text-[13px] font-medium text-[#aaa] mt-0.5">Rib Maker</div>
           </div>
