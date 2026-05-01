@@ -117,6 +117,14 @@ export default function ChatPanel({
     }
   }, [isFloating, floatingFadingOut]);
 
+  // Close drawer on Escape
+  useEffect(() => {
+    if (!isDrawer || !isOpen || !onClose) return;
+    const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [isDrawer, isOpen, onClose]);
+
   // Save keys to localStorage
   const handleKeyChange = useCallback((val: string) => {
     setApiKey(val);
@@ -476,10 +484,11 @@ export default function ChatPanel({
             {onClose && (
               <button
                 onClick={onClose}
-                className="w-7 h-7 rounded-md text-[#888] hover:text-white hover:bg-[#3a3a42] transition-colors flex items-center justify-center text-lg"
+                className="w-9 h-9 rounded-md text-white bg-[#3a3a42] hover:bg-[#5a5a62] border border-[#5a5a62] transition-colors flex items-center justify-center text-2xl leading-none font-bold shrink-0"
                 aria-label="Close"
+                title="Close (Esc)"
               >
-                &times;
+                ×
               </button>
             )}
           </div>
