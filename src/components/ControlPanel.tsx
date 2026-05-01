@@ -159,6 +159,7 @@ export default function ControlPanel(props: ControlPanelProps) {
   } = props;
 
   const [imagePreviewSrc, setImagePreviewSrc] = useState<string | null>(null);
+  const [showAdvanced, setShowAdvanced] = useState(false);
 
   const updateParam = useCallback(
     (key: keyof RibParams, value: number | string) => {
@@ -347,32 +348,6 @@ export default function ControlPanel(props: ControlPanelProps) {
         </Section>
       )}
 
-      {/* Curve Settings */}
-      <Section title="Curve Settings" defaultOpen={false}>
-        <Slider
-          label="Control Points"
-          value={params.controlPoints}
-          min={5}
-          max={100}
-          step={1}
-          onChange={(v) => updateParam('controlPoints', v)}
-          info="Points sampled to define curve shape"
-        />
-        <Slider
-          label="Display Resolution"
-          value={params.displayResolution}
-          min={50}
-          max={500}
-          step={10}
-          onChange={(v) => updateParam('displayResolution', v)}
-          info="Segments for smooth curve rendering"
-        />
-        <div className="bg-[#1a1a1f] p-2 rounded text-[10px] text-[#666] mt-2.5">
-          Control spacing: <span className="text-[#7c9bff]">{curveControlSpacing.toFixed(2)}</span>" |
-          Segment size: <span className="text-[#7c9bff]">{curveSegmentSize.toFixed(3)}</span>"
-        </div>
-      </Section>
-
       {/* Installation Mode */}
       <Section title="Installation Mode">
         <div className="flex gap-1 bg-[#2a2a30] rounded-md p-[3px]">
@@ -403,11 +378,6 @@ export default function ControlPanel(props: ControlPanelProps) {
             />
           </div>
         )}
-      </Section>
-
-      {/* Floor */}
-      <Section title="Floor" defaultOpen={false}>
-        <Toggle label="Wood Floor" checked={floorEnabled} onChange={onFloorEnabledChange} />
       </Section>
 
       {/* View */}
@@ -518,20 +488,63 @@ export default function ControlPanel(props: ControlPanelProps) {
         </div>
       </Section>
 
-      {/* Scale Reference */}
-      <Section title="Scale Reference" defaultOpen={false}>
-        <Toggle
-          label="Person for Scale"
-          checked={scaleFigureEnabled}
-          onChange={onScaleFigureEnabledChange}
-        />
-        <p className="text-[10px] text-[#666] mt-1">5'8" figure. Drag to reposition.</p>
-      </Section>
+      {/* Advanced Settings toggle */}
+      <button
+        onClick={() => setShowAdvanced(!showAdvanced)}
+        className="w-full mt-1 mb-2 py-2 text-[11px] font-semibold text-[#888] hover:text-white uppercase tracking-wider transition-colors"
+      >
+        {showAdvanced ? '▲ Hide Advanced Settings' : '▼ Show Advanced Settings'}
+      </button>
 
-      {/* Controls info */}
-      <div className="bg-[#1a1a1f] rounded-md p-2.5 mt-3 text-[10px] text-[#666] leading-relaxed">
-        <strong className="text-[#999]">Controls:</strong> Left-click drag to rotate, right-click to pan, scroll to zoom.
-      </div>
+      {showAdvanced && (
+        <>
+          {/* Curve Settings */}
+          <Section title="Curve Settings" defaultOpen={false}>
+            <Slider
+              label="Control Points"
+              value={params.controlPoints}
+              min={5}
+              max={100}
+              step={1}
+              onChange={(v) => updateParam('controlPoints', v)}
+              info="Points sampled to define curve shape"
+            />
+            <Slider
+              label="Display Resolution"
+              value={params.displayResolution}
+              min={50}
+              max={500}
+              step={10}
+              onChange={(v) => updateParam('displayResolution', v)}
+              info="Segments for smooth curve rendering"
+            />
+            <div className="bg-[#1a1a1f] p-2 rounded text-[10px] text-[#666] mt-2.5">
+              Control spacing: <span className="text-[#7c9bff]">{curveControlSpacing.toFixed(2)}</span>" |
+              Segment size: <span className="text-[#7c9bff]">{curveSegmentSize.toFixed(3)}</span>"
+            </div>
+          </Section>
+
+          {/* Floor */}
+          <Section title="Floor" defaultOpen={false}>
+            <Toggle label="Wood Floor" checked={floorEnabled} onChange={onFloorEnabledChange} />
+          </Section>
+
+          {/* Scale Reference */}
+          <Section title="Scale Reference" defaultOpen={false}>
+            <Toggle
+              label="Person for Scale"
+              checked={scaleFigureEnabled}
+              onChange={onScaleFigureEnabledChange}
+            />
+            <p className="text-[10px] text-[#666] mt-1">5'8" figure. Drag to reposition.</p>
+          </Section>
+
+          {/* Controls info */}
+          <div className="bg-[#1a1a1f] rounded-md p-2.5 mt-3 text-[10px] text-[#666] leading-relaxed">
+            <strong className="text-[#999]">Controls:</strong> Left-click drag to rotate, right-click to pan, scroll to zoom.
+          </div>
+        </>
+      )}
     </div>
   );
 }
