@@ -48,8 +48,8 @@ export default function ExportBar({
   }, [params, installationMode, ledEnabled]);
 
   const handleExportPDF = useCallback(() => {
-    exportRibShopDrawingPDF(params, installationMode, ledEnabled, rendererRef, sceneRef, cameraRef);
-  }, [params, installationMode, ledEnabled, rendererRef, sceneRef, cameraRef]);
+    exportRibShopDrawingPDF(params, installationMode, ledEnabled);
+  }, [params, installationMode, ledEnabled]);
 
   return (
     <div className="bg-[#3a3a42] rounded-lg p-4 mb-3">
