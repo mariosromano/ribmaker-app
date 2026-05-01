@@ -63,6 +63,7 @@ interface RightPanelProps {
   cameraRef: React.MutableRefObject<THREE.PerspectiveCamera | null>;
   showAdvanced: boolean;
   onShowAdvancedChange: (show: boolean) => void;
+  onOpenAskMara: () => void;
 }
 
 function RightPanel(props: RightPanelProps) {
@@ -75,7 +76,7 @@ function RightPanel(props: RightPanelProps) {
     wallpaperEnabled, onWallpaperEnabledChange, scaleFigureEnabled,
     onScaleFigureEnabledChange, imageScale, onImageScaleChange,
     onImageModeChange, ribProfiles, rendererRef, sceneRef, cameraRef,
-    showAdvanced, onShowAdvancedChange,
+    showAdvanced, onShowAdvancedChange, onOpenAskMara,
   } = props;
 
   const pricing = useMemo(
@@ -88,18 +89,27 @@ function RightPanel(props: RightPanelProps) {
   return (
     <div className="w-[340px] min-w-[340px] bg-[#2a2a30] h-screen overflow-y-auto py-5 px-6 flex flex-col">
       <div className="flex-1">
-        {/* Brand + Price (always visible) */}
-        <div className="flex items-start justify-between mb-3">
+        {/* Brand + Ask Mara button */}
+        <div className="flex items-center justify-between mb-3">
           <div>
-            <div className="text-[20px] font-bold tracking-tight leading-tight text-[#d4af37]">
+            <div className="text-[18px] font-bold tracking-tight leading-tight text-[#d4af37]">
               MAKE REAL
             </div>
-            <div className="text-[13px] font-medium text-[#aaa] mt-0.5">Rib Maker</div>
+            <div className="text-[11px] font-medium text-[#888] mt-0.5 font-mono tracking-widest uppercase">Rib Maker</div>
           </div>
-          <div className="bg-[#2d4a2d] rounded-lg px-3 py-2 text-right shrink-0 ml-3">
-            <div className="text-[8px] text-[#8eff8e]/60 uppercase tracking-wider leading-none mb-1">Est. Price</div>
-            <div className="text-[17px] font-bold text-[#8eff8e] leading-none font-mono">{fmtPrice(pricing.totalPrice)}</div>
-          </div>
+          <button
+            onClick={onOpenAskMara}
+            className="px-3.5 py-2 rounded-full text-[12px] font-semibold text-white bg-gradient-to-br from-[#d4af37] to-[#b8941f] shadow-[0_2px_10px_rgba(212,175,55,0.35)] hover:brightness-110 transition-all flex items-center gap-1.5"
+          >
+            <span className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center text-[11px] font-bold">M</span>
+            Ask Mara
+          </button>
+        </div>
+
+        {/* Price card */}
+        <div className="bg-[#2d4a2d] rounded-lg px-3 py-2 text-right mb-3 flex items-center justify-between">
+          <div className="text-[9px] text-[#8eff8e]/70 uppercase tracking-wider">Est. Price</div>
+          <div className="text-[17px] font-bold text-[#8eff8e] leading-none font-mono">{fmtPrice(pricing.totalPrice)}</div>
         </div>
 
         {/* Quick summary (always visible) */}
@@ -219,6 +229,7 @@ export default function App() {
   // First-time user onboarding state
   const [isFirstTimeUser, setIsFirstTimeUser] = useState(false);
   const [sidebarReady, setSidebarReady] = useState(true);
+  const [askMaraOpen, setAskMaraOpen] = useState(false);
 
   useEffect(() => {
     const onboarded = localStorage.getItem('ribmaker_onboarded') === 'true';
@@ -248,30 +259,6 @@ export default function App() {
 
   return (
     <div className="flex w-screen h-screen">
-      {/* Left: AI Chat Panel */}
-      <ChatPanel
-        params={params}
-        onParamsChange={setParams}
-        onInstallationModeChange={setInstallationMode}
-        onLightingPresetChange={setLightingPreset}
-        onLedEnabledChange={setLedEnabled}
-        onLedColorStartChange={setLedColorStart}
-        onLedColorEndChange={setLedColorEnd}
-        onLedIntensityChange={setLedIntensity}
-        onBackdropColorChange={setBackdropColor}
-        onBgColorChange={setBgColor}
-        onImageScaleChange={setImageScale}
-        onImageModeChange={handleImageModeChange}
-        onScaleFigureEnabledChange={setScaleFigureEnabled}
-        onFloorEnabledChange={setFloorEnabled}
-        rendererRef={rendererRef}
-        sceneRef={sceneRef}
-        cameraRef={cameraRef}
-        isFloating={isFirstTimeUser}
-        sidebarReady={sidebarReady}
-        onOnboardingComplete={completeOnboarding}
-      />
-
       {/* Center: 3D Viewport — hero area */}
       <Viewport3D
         params={params}
@@ -293,42 +280,72 @@ export default function App() {
         cameraRef={cameraRef}
       />
 
-      {/* Right: Summary + Advanced Controls + Export + Info */}
-      <RightPanel
-        params={params}
-        onParamsChange={setParams}
-        installationMode={installationMode}
-        onInstallationModeChange={setInstallationMode}
-        lightingPreset={lightingPreset}
-        onLightingPresetChange={setLightingPreset}
-        ledEnabled={ledEnabled}
-        onLedEnabledChange={setLedEnabled}
-        ledColorStart={ledColorStart}
-        onLedColorStartChange={setLedColorStart}
-        ledColorEnd={ledColorEnd}
-        onLedColorEndChange={setLedColorEnd}
-        ledIntensity={ledIntensity}
-        onLedIntensityChange={setLedIntensity}
-        backdropColor={backdropColor}
-        onBackdropColorChange={setBackdropColor}
-        bgColor={bgColor}
-        onBgColorChange={setBgColor}
-        floorEnabled={floorEnabled}
-        onFloorEnabledChange={setFloorEnabled}
-        wallpaperEnabled={wallpaperEnabled}
-        onWallpaperEnabledChange={setWallpaperEnabled}
-        scaleFigureEnabled={scaleFigureEnabled}
-        onScaleFigureEnabledChange={setScaleFigureEnabled}
-        imageScale={imageScale}
-        onImageScaleChange={setImageScale}
-        onImageModeChange={handleImageModeChange}
-        ribProfiles={ribProfiles}
-        rendererRef={rendererRef}
-        sceneRef={sceneRef}
-        cameraRef={cameraRef}
-        showAdvanced={showAdvanced}
-        onShowAdvancedChange={setShowAdvanced}
-      />
+      {/* Right: Summary + Advanced Controls + Export + Info, with Ask Mara drawer overlay */}
+      <div className="relative overflow-hidden" style={{ width: 340 }}>
+        <RightPanel
+          params={params}
+          onParamsChange={setParams}
+          installationMode={installationMode}
+          onInstallationModeChange={setInstallationMode}
+          lightingPreset={lightingPreset}
+          onLightingPresetChange={setLightingPreset}
+          ledEnabled={ledEnabled}
+          onLedEnabledChange={setLedEnabled}
+          ledColorStart={ledColorStart}
+          onLedColorStartChange={setLedColorStart}
+          ledColorEnd={ledColorEnd}
+          onLedColorEndChange={setLedColorEnd}
+          ledIntensity={ledIntensity}
+          onLedIntensityChange={setLedIntensity}
+          backdropColor={backdropColor}
+          onBackdropColorChange={setBackdropColor}
+          bgColor={bgColor}
+          onBgColorChange={setBgColor}
+          floorEnabled={floorEnabled}
+          onFloorEnabledChange={setFloorEnabled}
+          wallpaperEnabled={wallpaperEnabled}
+          onWallpaperEnabledChange={setWallpaperEnabled}
+          scaleFigureEnabled={scaleFigureEnabled}
+          onScaleFigureEnabledChange={setScaleFigureEnabled}
+          imageScale={imageScale}
+          onImageScaleChange={setImageScale}
+          onImageModeChange={handleImageModeChange}
+          ribProfiles={ribProfiles}
+          rendererRef={rendererRef}
+          sceneRef={sceneRef}
+          cameraRef={cameraRef}
+          showAdvanced={showAdvanced}
+          onShowAdvancedChange={setShowAdvanced}
+          onOpenAskMara={() => setAskMaraOpen(true)}
+        />
+
+        {/* Ask Mara drawer — slides over RightPanel */}
+        <ChatPanel
+          params={params}
+          onParamsChange={setParams}
+          onInstallationModeChange={setInstallationMode}
+          onLightingPresetChange={setLightingPreset}
+          onLedEnabledChange={setLedEnabled}
+          onLedColorStartChange={setLedColorStart}
+          onLedColorEndChange={setLedColorEnd}
+          onLedIntensityChange={setLedIntensity}
+          onBackdropColorChange={setBackdropColor}
+          onBgColorChange={setBgColor}
+          onImageScaleChange={setImageScale}
+          onImageModeChange={handleImageModeChange}
+          onScaleFigureEnabledChange={setScaleFigureEnabled}
+          onFloorEnabledChange={setFloorEnabled}
+          rendererRef={rendererRef}
+          sceneRef={sceneRef}
+          cameraRef={cameraRef}
+          isFloating={isFirstTimeUser}
+          sidebarReady={sidebarReady}
+          onOnboardingComplete={completeOnboarding}
+          isDrawer
+          isOpen={askMaraOpen}
+          onClose={() => setAskMaraOpen(false)}
+        />
+      </div>
     </div>
   );
 }

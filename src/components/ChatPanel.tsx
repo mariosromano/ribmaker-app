@@ -42,6 +42,9 @@ interface ChatPanelProps {
   isFloating?: boolean;
   sidebarReady?: boolean;
   onOnboardingComplete?: () => void;
+  isDrawer?: boolean;
+  isOpen?: boolean;
+  onClose?: () => void;
 }
 
 export default function ChatPanel({
@@ -65,6 +68,9 @@ export default function ChatPanel({
   isFloating = false,
   sidebarReady = true,
   onOnboardingComplete,
+  isDrawer = false,
+  isOpen = true,
+  onClose,
 }: ChatPanelProps) {
   const [apiKey, setApiKey] = useState(() => getSavedKey('ribmaker_api_key'));
   const [falKey, setFalKey] = useState(() => getSavedKey('ribmaker_fal_key'));
@@ -433,22 +439,49 @@ export default function ChatPanel({
         </div>
       )}
 
-      {/* ── Sidebar Chat Panel ─────────────────────────────────────── */}
+      {/* ── Sidebar / Drawer Chat Panel ─────────────────────────────── */}
       <div
-        className="flex flex-col bg-[#2a2a30] border-r border-[#3a3a42] h-screen"
-        style={{
-          width: sidebarReady ? 380 : 0,
-          minWidth: sidebarReady ? 380 : 0,
-          opacity: sidebarReady ? 1 : 0,
-          overflow: sidebarReady ? undefined : 'hidden',
-          borderRight: sidebarReady ? undefined : 'none',
-          transition: 'width 0.5s ease, min-width 0.5s ease, opacity 0.5s ease',
-        }}
+        className={
+          isDrawer
+            ? "absolute top-0 right-0 h-full flex flex-col bg-[#2a2a30] border-l border-[#3a3a42] shadow-[-8px_0_32px_rgba(0,0,0,0.4)] z-50"
+            : "flex flex-col bg-[#2a2a30] border-r border-[#3a3a42] h-screen"
+        }
+        style={
+          isDrawer
+            ? {
+                width: 380,
+                transform: isOpen ? 'translateX(0)' : 'translateX(110%)',
+                transition: 'transform 0.3s ease',
+              }
+            : {
+                width: sidebarReady ? 380 : 0,
+                minWidth: sidebarReady ? 380 : 0,
+                opacity: sidebarReady ? 1 : 0,
+                overflow: sidebarReady ? undefined : 'hidden',
+                borderRight: sidebarReady ? undefined : 'none',
+                transition: 'width 0.5s ease, min-width 0.5s ease, opacity 0.5s ease',
+              }
+        }
       >
         {/* Header + API Keys */}
         <div className="p-4 px-6 border-b border-[#3a3a42]">
-          <div className="text-lg font-bold text-white mb-2">
-            M<span className="text-[#7c9bff]">|</span>R Walls
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-2.5">
+              <div className="w-7 h-7 rounded-full bg-gradient-to-br from-[#d4af37] to-[#b8941f] flex items-center justify-center text-[12px] font-bold text-white shadow-[0_2px_8px_rgba(212,175,55,0.4)]">M</div>
+              <div>
+                <div className="text-[14px] font-semibold text-white leading-none">Ask Mara</div>
+                <div className="text-[10px] text-[#888] mt-0.5">Design assistant</div>
+              </div>
+            </div>
+            {onClose && (
+              <button
+                onClick={onClose}
+                className="w-7 h-7 rounded-md text-[#888] hover:text-white hover:bg-[#3a3a42] transition-colors flex items-center justify-center text-lg"
+                aria-label="Close"
+              >
+                &times;
+              </button>
+            )}
           </div>
           {!serverHasAnthropicKey && (
             <input
