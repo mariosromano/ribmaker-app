@@ -5,7 +5,8 @@ import type {
   LightingPreset,
 } from '../engine/types';
 import { WAVE_TYPES } from '../engine/types';
-import { loadImageData, clearImageData, hasImageData } from '../engine/ribEngine';
+import { loadImageData, clearImageData, hasImageData, loadImageFromUrl } from '../engine/ribEngine';
+import { PATTERNS } from '../engine/patterns';
 
 interface ControlPanelProps {
   params: RibParams;
@@ -252,6 +253,34 @@ export default function ControlPanel(props: ControlPanelProps) {
             />
           </div>
         )}
+      </Section>
+
+      {/* Browse Patterns */}
+      <Section title="Browse Patterns" defaultOpen={false}>
+        <div className="grid grid-cols-3 gap-1.5 max-h-[260px] overflow-y-auto pb-1">
+          {PATTERNS.map((p) => (
+            <button
+              key={p.id}
+              onClick={async () => {
+                try {
+                  await loadImageFromUrl(`/patterns/${p.file}`);
+                  setImagePreviewSrc(`/patterns/${p.file}`);
+                  onImageModeChange(true);
+                } catch {
+                  alert('Failed to load pattern');
+                }
+              }}
+              className="p-1 bg-[#1a1a1f] border border-[#3a3a42] rounded cursor-pointer text-center hover:border-[#7c9bff] transition-colors"
+            >
+              <img
+                src={`/patterns/${p.file}`}
+                alt={p.name}
+                className="w-full h-[50px] object-cover rounded-sm"
+              />
+              <div className="text-[9px] text-[#888] mt-0.5 truncate">{p.name}</div>
+            </button>
+          ))}
+        </div>
       </Section>
 
       {/* Array Settings */}
