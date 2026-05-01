@@ -61,8 +61,6 @@ interface RightPanelProps {
   rendererRef: React.MutableRefObject<THREE.WebGLRenderer | null>;
   sceneRef: React.MutableRefObject<THREE.Scene | null>;
   cameraRef: React.MutableRefObject<THREE.PerspectiveCamera | null>;
-  showAdvanced: boolean;
-  onShowAdvancedChange: (show: boolean) => void;
   onOpenAskMara: () => void;
 }
 
@@ -76,7 +74,7 @@ function RightPanel(props: RightPanelProps) {
     wallpaperEnabled, onWallpaperEnabledChange, scaleFigureEnabled,
     onScaleFigureEnabledChange, imageScale, onImageScaleChange,
     onImageModeChange, ribProfiles, rendererRef, sceneRef, cameraRef,
-    showAdvanced, onShowAdvancedChange, onOpenAskMara,
+    onOpenAskMara,
   } = props;
 
   const pricing = useMemo(
@@ -143,21 +141,8 @@ function RightPanel(props: RightPanelProps) {
           </div>
         </div>
 
-        {/* Advanced toggle */}
-        <button
-          onClick={() => onShowAdvancedChange(!showAdvanced)}
-          className={`w-full py-2.5 rounded-lg text-[12px] font-semibold mb-3 transition-colors ${
-            showAdvanced
-              ? 'bg-[#7c9bff] text-white'
-              : 'bg-[#3a3a42] text-[#aaa] hover:text-white hover:bg-[#4a4a52]'
-          }`}
-        >
-          {showAdvanced ? 'Hide Advanced Controls' : 'Advanced Controls'}
-        </button>
-
-        {/* Full ControlPanel (only when advanced is open) */}
-        {showAdvanced && (
-          <ControlPanel
+        {/* Full ControlPanel — always visible */}
+        <ControlPanel
             params={params}
             onParamsChange={onParamsChange}
             installationMode={installationMode}
@@ -186,7 +171,6 @@ function RightPanel(props: RightPanelProps) {
             onImageScaleChange={onImageScaleChange}
             onImageModeChange={onImageModeChange}
           />
-        )}
 
         <ExportBar
           params={params}
@@ -213,7 +197,6 @@ export default function App() {
   const [installationMode, setInstallationMode] = useState<InstallationMode>('wall');
   const [lightingPreset, setLightingPreset] = useState<LightingPreset>('standard');
   const [ledEnabled, setLedEnabled] = useState(false);
-  const [showAdvanced, setShowAdvanced] = useState(false);
   const [ledColorStart, setLedColorStart] = useState('#ff0066');
   const [ledColorEnd, setLedColorEnd] = useState('#00ffff');
   const [ledIntensity, setLedIntensity] = useState(1.0);
@@ -314,8 +297,6 @@ export default function App() {
           rendererRef={rendererRef}
           sceneRef={sceneRef}
           cameraRef={cameraRef}
-          showAdvanced={showAdvanced}
-          onShowAdvancedChange={setShowAdvanced}
           onOpenAskMara={() => setAskMaraOpen(true)}
         />
 
