@@ -333,17 +333,6 @@ export default function ControlPanel(props: ControlPanelProps) {
           format={(v) => `${v}"`}
           onChange={(v) => updateParam('maxDepth', v)}
         />
-        <div className="mb-3 last:mb-0">
-          <label className="block mb-1.5 text-xs text-[#ccc]">Rib Thickness</label>
-          <select
-            className="w-full p-2 border-none rounded bg-[#555] text-white text-xs cursor-pointer"
-            value={params.thickness}
-            onChange={(e) => updateParam('thickness', parseFloat(e.target.value))}
-          >
-            <option value="0.5">0.5 inch</option>
-            <option value="1">1 inch</option>
-          </select>
-        </div>
       </Section>
 
       {/* Wave Pattern (hidden when image loaded) */}
