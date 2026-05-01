@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
 import * as THREE from 'three';
 import type { RibParams, RibProfile, InstallationMode } from '../engine/types';
-import { exportDXF, exportCSV, downloadFile } from '../engine/ribEngine';
+import { exportDXF, downloadFile } from '../engine/ribEngine';
 import { exportRibShopDrawingPDF } from '../engine/shopDrawingPDF';
 
 interface ExportBarProps {
@@ -42,11 +42,6 @@ export default function ExportBar({
     downloadFile(dxf, 'mr-walls-ribs.dxf', 'application/dxf');
   }, [ribProfiles, params]);
 
-  const handleExportCSV = useCallback(() => {
-    const csv = exportCSV(params, installationMode, ledEnabled);
-    downloadFile(csv, 'mr-walls-ribs.csv', 'text/csv');
-  }, [params, installationMode, ledEnabled]);
-
   const handleExportPDF = useCallback(() => {
     exportRibShopDrawingPDF(params, installationMode, ledEnabled);
   }, [params, installationMode, ledEnabled]);
@@ -72,12 +67,6 @@ export default function ExportBar({
           onClick={handleExportDXF}
         >
           Export DXF (All Ribs)
-        </button>
-        <button
-          className="w-full py-2.5 rounded-md bg-[#4a4a52] hover:bg-[#5a5a62] text-white text-xs font-medium transition-colors"
-          onClick={handleExportCSV}
-        >
-          Export Dimensions CSV
         </button>
       </div>
     </div>
