@@ -170,6 +170,9 @@ function RightPanel(props: RightPanelProps) {
             imageScale={imageScale}
             onImageScaleChange={onImageScaleChange}
             onImageModeChange={onImageModeChange}
+            rendererRef={rendererRef}
+            sceneRef={sceneRef}
+            cameraRef={cameraRef}
           />
 
         <ExportBar

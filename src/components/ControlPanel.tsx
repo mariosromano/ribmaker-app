@@ -1,4 +1,5 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
+import * as THREE from 'three';
 import type {
   RibParams,
   InstallationMode,
@@ -36,6 +37,9 @@ interface ControlPanelProps {
   imageScale: number;
   onImageScaleChange: (scale: number) => void;
   onImageModeChange: (hasImage: boolean) => void;
+  rendererRef: React.MutableRefObject<THREE.WebGLRenderer | null>;
+  sceneRef: React.MutableRefObject<THREE.Scene | null>;
+  cameraRef: React.MutableRefObject<THREE.PerspectiveCamera | null>;
 }
 
 function Section({
@@ -157,10 +161,100 @@ export default function ControlPanel(props: ControlPanelProps) {
     imageScale,
     onImageScaleChange,
     onImageModeChange,
+    rendererRef,
+    sceneRef,
+    cameraRef,
   } = props;
 
   const [imagePreviewSrc, setImagePreviewSrc] = useState<string | null>(null);
   const [showAdvanced, setShowAdvanced] = useState(false);
+
+  // Render state
+  const [rendering, setRendering] = useState(false);
+  const [renderResult, setRenderResult] = useState<string | null>(null);
+  const [renderError, setRenderError] = useState<string | null>(null);
+  const [scenePrompt, setScenePrompt] = useState('');
+  const [serverHasFalKey, setServerHasFalKey] = useState(false);
+
+  useEffect(() => {
+    fetch('/api/config')
+      .then((r) => r.json())
+      .then((cfg) => { if (cfg.hasFalKey) setServerHasFalKey(true); })
+      .catch(() => {});
+  }, []);
+
+  const captureScreenshot = useCallback((): string | null => {
+    const renderer = rendererRef.current;
+    const scene = sceneRef.current;
+    const camera = cameraRef.current;
+    if (!renderer || !scene || !camera) return null;
+    renderer.render(scene, camera);
+    const canvas = renderer.domElement;
+    const maxDim = 1536;
+    const w = canvas.width;
+    const h = canvas.height;
+    const scale = Math.min(1, maxDim / Math.max(w, h));
+    if (scale === 1) return canvas.toDataURL('image/jpeg', 0.85);
+    const off = document.createElement('canvas');
+    off.width = Math.round(w * scale);
+    off.height = Math.round(h * scale);
+    const ctx = off.getContext('2d');
+    if (!ctx) return null;
+    ctx.drawImage(canvas, 0, 0, off.width, off.height);
+    return off.toDataURL('image/jpeg', 0.85);
+  }, [rendererRef, sceneRef, cameraRef]);
+
+  const handleRender = useCallback(async () => {
+    const falKey = typeof window !== 'undefined' ? (localStorage.getItem('ribmaker_fal_key') ?? '') : '';
+    if (!falKey && !serverHasFalKey) {
+      setRenderError('FAL API key required (open Ask Mara to enter one).');
+      return;
+    }
+    setRendering(true);
+    setRenderError(null);
+    setRenderResult(null);
+    try {
+      const dataUrl = captureScreenshot();
+      if (!dataUrl) throw new Error('Could not capture screenshot');
+      const base64 = dataUrl.replace(/^data:image\/[a-z]+;base64,/, '');
+      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+      if (falKey) headers['x-fal-key'] = falKey;
+      const res = await fetch('/api/render', {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ image: base64, prompt: scenePrompt }),
+      });
+      const text = await res.text();
+      let data: { imageUrl?: string; error?: string };
+      try { data = JSON.parse(text); } catch { throw new Error(`Server error (${res.status})`); }
+      if (!res.ok) throw new Error(data.error || 'Render failed');
+      if (!data.imageUrl) throw new Error('No image returned');
+      setRenderResult(data.imageUrl);
+    } catch (err) {
+      setRenderError(err instanceof Error ? err.message : 'Render failed');
+    } finally {
+      setRendering(false);
+    }
+  }, [serverHasFalKey, scenePrompt, captureScreenshot]);
+
+  const handleDownloadRender = useCallback(async () => {
+    if (!renderResult) return;
+    try {
+      const res = await fetch(renderResult);
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'mr-walls-render.png';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch {
+      // Fallback: open in new tab so user can save manually
+      window.open(renderResult, '_blank');
+    }
+  }, [renderResult]);
 
   const updateParam = useCallback(
     (key: keyof RibParams, value: number | string) => {
@@ -268,20 +362,48 @@ export default function ControlPanel(props: ControlPanelProps) {
             Clear Image
           </button>
         )}
-        {hasImageData() && (
-          <div className="mt-3">
-            <Slider
-              label="Image Scale"
-              value={imageScale}
-              min={0.1}
-              max={5}
-              step={0.1}
-              onChange={onImageScaleChange}
-              info="Scale < 1: Image tiles/repeats"
-            />
+      </Section>
+
+      {/* Render Realistic */}
+      <Section title="Render Realistic" defaultOpen={true}>
+        <textarea
+          value={scenePrompt}
+          onChange={(e) => setScenePrompt(e.target.value)}
+          placeholder="Optional: describe the scene (e.g. 'modern hotel lobby, marble floors, warm light')"
+          rows={2}
+          className="w-full px-2.5 py-2 bg-[#1a1a1f] border border-[#3a3a42] rounded text-white text-[11px] resize-none outline-none focus:border-[#7a5aaa] mb-2"
+        />
+        <button
+          onClick={handleRender}
+          disabled={rendering}
+          className={`w-full py-2.5 rounded-md text-white text-xs font-semibold transition-all ${
+            rendering
+              ? 'bg-[#5a3a7a] cursor-default'
+              : 'bg-gradient-to-br from-[#7a5aaa] to-[#5a3a8a] hover:brightness-110 shadow-[0_2px_10px_rgba(122,90,170,0.35)]'
+          }`}
+        >
+          {rendering ? 'Rendering…' : 'Render Realistic'}
+        </button>
+        {renderError && (
+          <div className="mt-2 px-2 py-1.5 rounded bg-[#4a2a2a] text-[#ff6b6b] text-[10px]">
+            {renderError}
           </div>
         )}
       </Section>
+
+      {hasImageData() && (
+        <Section title="Image Scale">
+          <Slider
+            label="Image Scale"
+            value={imageScale}
+            min={0.1}
+            max={5}
+            step={0.1}
+            onChange={onImageScaleChange}
+            info="Scale < 1: Image tiles/repeats"
+          />
+        </Section>
+      )}
 
       {/* Array Settings */}
       <Section title="Array Settings">
@@ -562,6 +684,39 @@ export default function ControlPanel(props: ControlPanelProps) {
             <strong className="text-[#999]">Controls:</strong> Left-click drag to rotate, right-click to pan, scroll to zoom.
           </div>
         </>
+      )}
+
+      {/* Render Result Modal */}
+      {renderResult && (
+        <div
+          className="fixed inset-0 bg-black/85 flex items-center justify-center z-[9999] cursor-pointer"
+          onClick={() => setRenderResult(null)}
+        >
+          <div
+            className="relative max-w-[90vw] max-h-[90vh]"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <img
+              src={renderResult}
+              alt="Photorealistic Render"
+              className="max-w-[90vw] max-h-[85vh] rounded-xl shadow-[0_20px_60px_rgba(0,0,0,0.5)]"
+            />
+            <div className="flex gap-2 justify-center mt-3">
+              <button
+                onClick={handleDownloadRender}
+                className="px-6 py-2.5 bg-[#7c9bff] text-white rounded-md text-[13px] font-semibold cursor-pointer border-none"
+              >
+                Download
+              </button>
+              <button
+                onClick={() => setRenderResult(null)}
+                className="px-6 py-2.5 bg-[#4a4a52] text-white border-none rounded-md text-[13px] font-semibold cursor-pointer"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

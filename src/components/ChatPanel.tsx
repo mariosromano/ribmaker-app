@@ -653,15 +653,27 @@ export default function ChatPanel({
               className="max-w-[90vw] max-h-[85vh] rounded-xl shadow-[0_20px_60px_rgba(0,0,0,0.5)]"
             />
             <div className="flex gap-2 justify-center mt-3">
-              <a
-                href={renderResult}
-                download="mr-walls-render.png"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="px-6 py-2.5 bg-[#7c9bff] text-white rounded-md text-[13px] font-semibold no-underline"
+              <button
+                onClick={async () => {
+                  try {
+                    const r = await fetch(renderResult);
+                    const blob = await r.blob();
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'mr-walls-render.png';
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                  } catch {
+                    window.open(renderResult, '_blank');
+                  }
+                }}
+                className="px-6 py-2.5 bg-[#7c9bff] text-white rounded-md text-[13px] font-semibold cursor-pointer border-none"
               >
                 Download
-              </a>
+              </button>
               <button
                 onClick={() => setRenderResult(null)}
                 className="px-6 py-2.5 bg-[#4a4a52] text-white border-none rounded-md text-[13px] font-semibold cursor-pointer"
