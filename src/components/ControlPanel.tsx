@@ -734,7 +734,7 @@ export default function ControlPanel(props: ControlPanelProps) {
                   from the top.
                 </p>
                 <img
-                  src="/installation/Rib%20detail2.png"
+                  src="/installation/step-1.png"
                   alt="Step 1.1 — fin into channel"
                   className="w-full rounded border border-[#3a3a42] bg-white"
                   onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
@@ -750,7 +750,7 @@ export default function ControlPanel(props: ControlPanelProps) {
                   fasten the fin to the channel through the remaining holes.
                 </p>
                 <img
-                  src="/installation/RIB%20Detail.png"
+                  src="/installation/step-2.png"
                   alt="Step 1.2 — L-bracket fastening"
                   className="w-full rounded border border-[#3a3a42] bg-white"
                   onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
@@ -764,7 +764,7 @@ export default function ControlPanel(props: ControlPanelProps) {
                   Detail view of the L-bracket secured through the channel slot.
                 </p>
                 <img
-                  src="/installation/Rib%20CU%20detail.png"
+                  src="/installation/step-2-detail.png"
                   alt="Detail A — bracket close-up"
                   className="w-full rounded border border-[#3a3a42] bg-white"
                   onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
