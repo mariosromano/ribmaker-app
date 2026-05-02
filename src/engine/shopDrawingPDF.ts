@@ -84,16 +84,14 @@ function drawElevationView(
   pdf.text(fmtFt(totalLen), ox + drawW / 2, dimY - 0.06, { align: 'center' });
 
   // Left dimension — wall height
-  const ddX = ox - 0.22;
+  const ddX = ox - 0.28;
   pdf.line(ddX, oy, ddX, oy + drawH);
-  pdf.line(ddX - 0.05, oy, ddX + 0.05, oy + drawH);
-  pdf.line(ddX - 0.05, oy + drawH, ddX + 0.05, oy + drawH);
   pdf.line(ddX - 0.05, oy, ddX + 0.05, oy);
+  pdf.line(ddX - 0.05, oy + drawH, ddX + 0.05, oy + drawH);
   pdf.setFontSize(8);
   pdf.setTextColor(50);
   pdf.setFont('helvetica', 'bold');
-  // Rotate text 90deg for vertical label
-  pdf.text(fmtFt(wallH), ddX - 0.07, oy + drawH / 2, { align: 'right', angle: 90 });
+  pdf.text(fmtFt(wallH), ddX - 0.12, oy + drawH / 2, { align: 'center', angle: 90 });
 
   // Bottom dimension — first two ribs O.C. spacing
   if (params.count >= 2) {
@@ -182,14 +180,14 @@ function drawPlanView(
   pdf.text(fmtFt(totalLen), ox + drawW / 2, dimY - 0.06, { align: 'center' });
 
   // Left dim — max depth
-  const ddX = ox - 0.22;
-  pdf.line(ddX, oy + drawH - drawH, ddX, oy + drawH);
-  pdf.line(ddX - 0.05, oy + drawH - drawH, ddX + 0.05, oy + drawH - drawH);
+  const ddX = ox - 0.28;
+  pdf.line(ddX, oy, ddX, oy + drawH);
+  pdf.line(ddX - 0.05, oy, ddX + 0.05, oy);
   pdf.line(ddX - 0.05, oy + drawH, ddX + 0.05, oy + drawH);
   pdf.setFontSize(8);
   pdf.setTextColor(50);
   pdf.setFont('helvetica', 'bold');
-  pdf.text(`${params.maxDepth}"`, ddX - 0.07, oy + drawH / 2, { align: 'right', angle: 90 });
+  pdf.text(`${params.maxDepth}"`, ddX - 0.12, oy + drawH / 2, { align: 'center', angle: 90 });
 
   // Bottom callout — depth range
   pdf.setFontSize(7);
