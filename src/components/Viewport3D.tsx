@@ -128,14 +128,19 @@ export default function Viewport3D({
     // Scale figure drag
     setupScaleFigureDrag(renderer.domElement, camera, controls, scene);
 
-    // Handle resize
+    // Handle resize — both window resize AND container size changes (panel drag)
     const onResize = () => {
       if (!container) return;
-      camera.aspect = container.clientWidth / container.clientHeight;
+      const w = container.clientWidth;
+      const h = container.clientHeight;
+      if (w === 0 || h === 0) return;
+      camera.aspect = w / h;
       camera.updateProjectionMatrix();
-      renderer.setSize(container.clientWidth, container.clientHeight);
+      renderer.setSize(w, h);
     };
     window.addEventListener('resize', onResize);
+    const resizeObserver = new ResizeObserver(onResize);
+    resizeObserver.observe(container);
 
     // Animation loop
     const animate = () => {
@@ -147,6 +152,7 @@ export default function Viewport3D({
 
     return () => {
       window.removeEventListener('resize', onResize);
+      resizeObserver.disconnect();
       cancelAnimationFrame(animFrameRef.current);
       renderer.dispose();
       if (container.contains(renderer.domElement)) {
