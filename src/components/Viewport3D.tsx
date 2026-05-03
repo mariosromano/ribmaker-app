@@ -69,6 +69,7 @@ export default function Viewport3D({
   const animFrameRef = useRef<number>(0);
   const wallpaperTextureRef = useRef<THREE.Texture | null>(null);
   const initializedRef = useRef(false);
+  const didInitialFrameRef = useRef(false);
 
   // Initialize Three.js scene
   useEffect(() => {
@@ -384,6 +385,15 @@ export default function Viewport3D({
     }
 
     onRibProfilesGenerated(ribProfiles);
+
+    // First time we have ribs, snap the camera to a clean 3D framed view of the wall
+    if (!didInitialFrameRef.current && ribProfiles.length > 0) {
+      didInitialFrameRef.current = true;
+      // Defer until after the setView function is registered in its own effect
+      requestAnimationFrame(() => {
+        (window as any).__ribmakerSetView?.('perspective');
+      });
+    }
   }, [params, installationMode, imageScale, backdropColor, wallpaperEnabled, ledEnabled, ledColorStart, ledColorEnd, ledIntensity]);
 
   // ── Lighting ──
