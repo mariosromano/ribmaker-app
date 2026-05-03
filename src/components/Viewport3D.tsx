@@ -386,10 +386,18 @@ export default function Viewport3D({
 
     onRibProfilesGenerated(ribProfiles);
 
+    // Always keep the orbit pivot at the wall's vertical center — otherwise
+    // OrbitControls rotates around (0,0,0) (the floor), making the wall
+    // swing around its base instead of its center.
+    if (controlsRef.current) {
+      const wallCenterY = (params.height * SCALE) / 2;
+      controlsRef.current.target.set(0, wallCenterY, 0);
+      controlsRef.current.update();
+    }
+
     // First time we have ribs, snap the camera to a clean 3D framed view of the wall
     if (!didInitialFrameRef.current && ribProfiles.length > 0) {
       didInitialFrameRef.current = true;
-      // Defer until after the setView function is registered in its own effect
       requestAnimationFrame(() => {
         (window as any).__ribmakerSetView?.('perspective');
       });
