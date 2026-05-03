@@ -616,31 +616,27 @@ export default function Viewport3D({
         return Math.max(distH, distW) * padding;
       };
 
-      // Snap camera + target + up vector + reset OrbitControls state cleanly
-      const snap = (pos: [number, number, number], tgt: [number, number, number], up: [number, number, number] = [0, 1, 0]) => {
-        camera.up.set(up[0], up[1], up[2]);
+      // Always Y-up; just move the camera and target. Don't touch camera.up
+      // (changing it leaves OrbitControls in a stuck rotation state).
+      const snap = (pos: [number, number, number], tgt: [number, number, number]) => {
         camera.position.set(pos[0], pos[1], pos[2]);
         controls.target.set(tgt[0], tgt[1], tgt[2]);
-        camera.lookAt(controls.target);
-        camera.updateProjectionMatrix();
         controls.update();
       };
 
       switch (view) {
         case 'front': {
-          // Look down -X axis at the wall (wall lies in YZ plane)
           const d = fitDistance(totalWidth, wallH);
           snap([maxD + d, centerY, 0], [0, centerY, 0]);
           break;
         }
         case 'top': {
-          // Look down -Y axis (camera above, looking down)
+          // From slightly forward + above so OrbitControls keeps Y-up cleanly
           const d = fitDistance(totalWidth, maxD);
-          snap([0, d, 0], [0, 0, 0], [0, 0, -1]);
+          snap([0, d, 0.001], [0, 0, 0]);
           break;
         }
         case 'side': {
-          // Look down -Z axis at one end of the wall
           const d = fitDistance(maxD, wallH);
           snap([maxD / 2, centerY, d], [maxD / 2, centerY, 0]);
           break;
