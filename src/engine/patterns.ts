@@ -4,20 +4,22 @@ export interface Pattern {
   file: string;
 }
 
+// Curated set: each pattern is a smooth grayscale gradient with full 0..255
+// range and strong horizontal variation, so the rib-depth sampler produces
+// flowing, designed-looking walls (no chaotic noise).
+//
+// Top row = strongest first impression.
 export const PATTERNS: Pattern[] = [
-  { id: "rings", name: "Rings", file: "rings.png" },
-  { id: "voronoi_cells", name: "Voronoi Cells", file: "v2_01_voronoi_cells.png" },
-  { id: "turing_spots", name: "Turing Spots", file: "v2_02_turing_spots.png" },
-  { id: "lissajous_web", name: "Lissajous Web", file: "v2_03_lissajous_web.png" },
-  { id: "flow_field", name: "Flow Field", file: "v2_04_flow_field.png" },
-  { id: "hexagonal_grid", name: "Hexagonal Grid", file: "v2_05_hexagonal_grid.png" },
-  { id: "moire_interference", name: "Moire", file: "v2_07_moire_interference.png" },
-  { id: "diamond_ripple", name: "Diamond Ripple", file: "v2_08_diamond_ripple.png" },
-  { id: "islamic_geometry", name: "Islamic Geo", file: "v2_09_islamic_geometry.png" },
-  { id: "mountain_contours", name: "Mountains", file: "v2_10_mountain_contours.png" },
-  { id: "stepped_pyramid", name: "Pyramid", file: "v2_12_stepped_pyramid.png" },
-  { id: "rose_curve", name: "Rose Curve", file: "v2_13_rose_curve.png" },
-  { id: "warped_checker", name: "Warped Check", file: "v2_14_warped_checker.png" },
-  { id: "soundwave_stack", name: "Soundwave", file: "v2_17_soundwave_stack.png" },
-  { id: "hypnotic_eye", name: "Hypnotic Eye", file: "v2_18_hypnotic_eye.png" },
+  { id: 'rings',             name: 'Rings',         file: 'rings.png' },
+  { id: 'horizontal_waves',  name: 'Sine Bands',    file: 'horizontal_waves.png' },
+  { id: 'zigzag_organic',    name: 'Organic Wave',  file: 'zigzag_organic.png' },
+  { id: 'flow_field',        name: 'Flow Field',    file: 'flow_field.png' },
+  { id: 'diagonal_waves',    name: 'Diagonal Wave', file: 'diagonal_waves.png' },
+  { id: 'topo_contours',     name: 'Topography',    file: 'topo_contours.png' },
+  { id: 'mountain_horizon',  name: 'Mountain',      file: 'mountain_horizon.png' },
+  { id: 'radial_dome',       name: 'Dome',          file: 'radial_dome.png' },
+  { id: 'spiral',            name: 'Spiral',        file: 'spiral.png' },
+  { id: 'vertical_gradient', name: 'Gradient',      file: 'vertical_gradient.png' },
+  { id: 'ridges',            name: 'Ridges',        file: 'ridges.png' },
+  { id: 'ocean_waves',       name: 'Ocean',         file: 'ocean_waves.png' },
 ];
