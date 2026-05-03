@@ -17,19 +17,11 @@ export default function InfoBar({ params, installationMode, ledEnabled }: InfoBa
   const fmt = (n: number) =>
     '$' + n.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
 
-  const pricePerSheet = pricing.sheetsNeeded > 0 ? pricing.totalPrice / pricing.sheetsNeeded : 0;
-  const pricePerRib = params.count > 0 ? pricing.totalPrice / params.count : 0;
-
   return (
     <div className="space-y-1.5">
-      {/* Internal verification — not for public release */}
-      <div className="text-[9px] text-[#666] uppercase tracking-wider px-1">Internal · for verification</div>
-
       {/* Dimensions */}
       <div className="font-mono text-[11px] text-[#888] p-2.5 bg-[#1a1a1f] rounded leading-[1.8]">
         <strong className="text-[#aaa]">Number of Ribs:</strong> {params.count}<br />
-        <strong className="text-[#aaa]">Min Depth:</strong> {params.minDepth}"{' '}
-        | <strong className="text-[#aaa]">Max Depth:</strong> {params.maxDepth}"<br />
         <strong className="text-[#aaa]">Total Array Width:</strong>{' '}
         {pricing.totalWidth.toFixed(1)}" ({(pricing.totalWidth / 12).toFixed(1)}')
         <br />
@@ -47,8 +39,7 @@ export default function InfoBar({ params, installationMode, ledEnabled }: InfoBa
         {pricing.sheetsNeeded}
         {pricing.sectionsPerRib > 1 && ` (spliced, ${pricing.sectionsPerRib} sections/rib)`}
         <br />
-        <strong>Sheet price:</strong> {fmt(pricePerSheet)}/sheet{' '}
-        <small>(total ÷ {pricing.sheetsNeeded})</small>
+        <strong>Sheet cost:</strong> {pricing.sheetsNeeded} × $1,800 = {fmt(pricing.sheetTotalCost)}
       </div>
 
       {/* Pricing */}
@@ -66,9 +57,6 @@ export default function InfoBar({ params, installationMode, ledEnabled }: InfoBa
             <br />
           </>
         )}
-        <strong className="text-[#aaa]">Per rib:</strong> {fmt(pricePerRib)}{' '}
-        <small>(total ÷ {params.count})</small>
-        <br />
         <span className="text-lg font-bold text-[#8eff8e]">{fmt(pricing.totalPrice)}</span>
       </div>
     </div>
