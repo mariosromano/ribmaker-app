@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import * as THREE from 'three';
 import type {
   RibParams,
@@ -176,6 +176,31 @@ export default function ControlPanel(props: ControlPanelProps) {
   const [scenePrompt, setScenePrompt] = useState('');
   const [serverHasFalKey, setServerHasFalKey] = useState(false);
   const [installOpen, setInstallOpen] = useState(false);
+  const [renderProgress, setRenderProgress] = useState(0);
+  const [renderElapsed, setRenderElapsed] = useState(0);
+  const renderStartRef = useRef<number | null>(null);
+  const renderTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  useEffect(() => {
+    if (rendering) {
+      renderStartRef.current = Date.now();
+      setRenderProgress(0);
+      setRenderElapsed(0);
+      renderTimerRef.current = setInterval(() => {
+        if (!renderStartRef.current) return;
+        const elapsed = (Date.now() - renderStartRef.current) / 1000;
+        setRenderElapsed(elapsed);
+        // Asymptote to ~92% so the bar never claims complete before the result lands
+        setRenderProgress(92 * (1 - Math.exp(-elapsed / 8)));
+      }, 100);
+    } else {
+      if (renderTimerRef.current) clearInterval(renderTimerRef.current);
+      renderTimerRef.current = null;
+    }
+    return () => {
+      if (renderTimerRef.current) clearInterval(renderTimerRef.current);
+    };
+  }, [rendering]);
 
   useEffect(() => {
     fetch('/api/config')
@@ -383,8 +408,21 @@ export default function ControlPanel(props: ControlPanelProps) {
               : 'bg-gradient-to-br from-[#7a5aaa] to-[#5a3a8a] hover:brightness-110 shadow-[0_2px_10px_rgba(122,90,170,0.35)]'
           }`}
         >
-          {rendering ? 'Rendering…' : 'Render Realistic'}
+          {rendering ? `Rendering… ${renderElapsed.toFixed(1)}s` : 'Render Realistic'}
         </button>
+        {rendering && (
+          <div className="mt-2">
+            <div className="h-1.5 w-full bg-[#2a2a30] rounded-full overflow-hidden">
+              <div
+                className="h-full bg-gradient-to-r from-[#7a5aaa] to-[#a87adf] transition-all"
+                style={{ width: `${renderProgress}%` }}
+              />
+            </div>
+            <div className="text-[10px] text-[#888] mt-1 text-center">
+              Photorealistic render usually takes ~15s
+            </div>
+          </div>
+        )}
         {renderError && (
           <div className="mt-2 px-2 py-1.5 rounded bg-[#4a2a2a] text-[#ff6b6b] text-[10px]">
             {renderError}

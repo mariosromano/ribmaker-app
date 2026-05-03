@@ -88,6 +88,30 @@ export default function ChatPanel({
   const [showAbout, setShowAbout] = useState(false);
   const [showRenderPanel, setShowRenderPanel] = useState(false);
   const [rendering, setRendering] = useState(false);
+  const [renderProgress, setRenderProgress] = useState(0);
+  const [renderElapsed, setRenderElapsed] = useState(0);
+  const renderStartRef = useRef<number | null>(null);
+  const renderTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  useEffect(() => {
+    if (rendering) {
+      renderStartRef.current = Date.now();
+      setRenderProgress(0);
+      setRenderElapsed(0);
+      renderTimerRef.current = setInterval(() => {
+        if (!renderStartRef.current) return;
+        const elapsed = (Date.now() - renderStartRef.current) / 1000;
+        setRenderElapsed(elapsed);
+        setRenderProgress(92 * (1 - Math.exp(-elapsed / 8)));
+      }, 100);
+    } else {
+      if (renderTimerRef.current) clearInterval(renderTimerRef.current);
+      renderTimerRef.current = null;
+    }
+    return () => {
+      if (renderTimerRef.current) clearInterval(renderTimerRef.current);
+    };
+  }, [rendering]);
   const [scenePrompt, setScenePrompt] = useState(
     'White Corian ribs, realistic architectural photography, accent lighting, keep exact rib geometry and scale'
   );
@@ -604,8 +628,21 @@ export default function ChatPanel({
                     : 'bg-gradient-to-br from-[#7a5aaa] to-[#5a3a8a] cursor-pointer'
                 }`}
               >
-                {rendering ? 'Rendering...' : (!falKey && !serverHasFalKey) ? 'Enter FAL Key Above' : 'Render'}
+                {rendering ? `Rendering… ${renderElapsed.toFixed(1)}s` : (!falKey && !serverHasFalKey) ? 'Enter FAL Key Above' : 'Render'}
               </button>
+              {rendering && (
+                <div className="mt-2">
+                  <div className="h-1.5 w-full bg-[#1a1a1f] rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-gradient-to-r from-[#7a5aaa] to-[#a87adf] transition-all"
+                      style={{ width: `${renderProgress}%` }}
+                    />
+                  </div>
+                  <div className="text-[10px] text-[#888] mt-1 text-center">
+                    Photorealistic render usually takes ~15s
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>
