@@ -641,9 +641,22 @@ export default function Viewport3D({
           snap([maxD / 2, centerY, d], [maxD / 2, centerY, 0]);
           break;
         }
-        case 'perspective':
-          snap([15, 10, 25], [0, centerY, 0]);
+        case 'perspective': {
+          // Auto-frame the 3D view: pull camera back proportional to wall size
+          // so perspective foreshortening stays gentle even on big walls.
+          const d = fitDistance(totalWidth, wallH, 1.6); // extra padding for the angle
+          // Position the camera along a ~25° elevation, ~30° azimuth from front
+          const elev = 0.45;     // sin of elevation angle
+          const az = 0.55;       // sin of azimuth (rotation around Y)
+          camera.position.set(
+            d * Math.sqrt(1 - elev * elev) * Math.sqrt(1 - az * az) + maxD,
+            centerY + d * elev,
+            d * az,
+          );
+          controls.target.set(0, centerY, 0);
+          controls.update();
           break;
+        }
       }
     };
   }, [params]);
