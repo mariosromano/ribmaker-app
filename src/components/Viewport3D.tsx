@@ -652,16 +652,14 @@ export default function Viewport3D({
           break;
         }
         case 'perspective': {
-          // Auto-frame the 3D view: pull camera back proportional to wall size
-          // so perspective foreshortening stays gentle even on big walls.
-          const d = fitDistance(totalWidth, wallH, 1.6); // extra padding for the angle
-          // Position the camera along a ~25° elevation, ~30° azimuth from front
-          const elev = 0.45;     // sin of elevation angle
-          const az = 0.55;       // sin of azimuth (rotation around Y)
+          // Pull camera mostly straight in front of wall, slight side + up
+          // for 3D feel. Distance scales with wall size so the wall always
+          // fits comfortably in frame.
+          const d = fitDistance(totalWidth, wallH, 1.4);
           camera.position.set(
-            d * Math.sqrt(1 - elev * elev) * Math.sqrt(1 - az * az) + maxD,
-            centerY + d * elev,
-            d * az,
+            maxD + d,            // mostly in front of wall (along +X)
+            centerY + wallH * 0.25, // slightly above center
+            totalWidth * 0.18,   // small side offset for 3D feel (NOT half-wall)
           );
           controls.target.set(0, centerY, 0);
           controls.update();
