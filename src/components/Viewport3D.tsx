@@ -604,22 +604,37 @@ export default function Viewport3D({
       if (!camera || !controls) return;
 
       const totalWidth = (params.count - 1) * params.spacing * SCALE;
-      const centerY = params.height * SCALE / 2;
+      const wallH = params.height * SCALE;
+      const centerY = wallH / 2;
       const maxD = params.maxDepth * SCALE;
 
+      // Distance needed for the camera to fit the wall in view, given its FOV and aspect
+      const fitDistance = (worldW: number, worldH: number, padding = 1.15) => {
+        const vFov = (camera.fov * Math.PI) / 180;
+        const distH = (worldH / 2) / Math.tan(vFov / 2);
+        const distW = (worldW / 2) / (Math.tan(vFov / 2) * camera.aspect);
+        return Math.max(distH, distW) * padding;
+      };
+
       switch (view) {
-        case 'front':
-          camera.position.set(maxD + 15, centerY, 0);
+        case 'front': {
+          const d = fitDistance(totalWidth, wallH);
+          camera.position.set(maxD + d, centerY, 0);
           controls.target.set(0, centerY, 0);
           break;
-        case 'top':
-          camera.position.set(0, 20, 0);
+        }
+        case 'top': {
+          const d = fitDistance(totalWidth, maxD);
+          camera.position.set(0, d, 0);
           controls.target.set(0, 0, 0);
           break;
-        case 'side':
-          camera.position.set(maxD / 2, centerY, totalWidth + 10);
+        }
+        case 'side': {
+          const d = fitDistance(maxD, wallH);
+          camera.position.set(maxD / 2, centerY, d);
           controls.target.set(maxD / 2, centerY, 0);
           break;
+        }
         case 'perspective':
           camera.position.set(15, 10, 25);
           controls.target.set(0, centerY, 0);
