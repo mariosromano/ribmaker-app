@@ -62,6 +62,7 @@ interface RightPanelProps {
   sceneRef: React.MutableRefObject<THREE.Scene | null>;
   cameraRef: React.MutableRefObject<THREE.PerspectiveCamera | null>;
   onOpenAskMara: () => void;
+  onCollapse: () => void;
   panelWidth: number;
 }
 
@@ -75,7 +76,7 @@ function RightPanel(props: RightPanelProps) {
     wallpaperEnabled, onWallpaperEnabledChange, scaleFigureEnabled,
     onScaleFigureEnabledChange, imageScale, onImageScaleChange,
     onImageModeChange, ribProfiles, rendererRef, sceneRef, cameraRef,
-    onOpenAskMara, panelWidth,
+    onOpenAskMara, onCollapse, panelWidth,
   } = props;
 
   const pricing = useMemo(
@@ -92,8 +93,16 @@ function RightPanel(props: RightPanelProps) {
     >
       <div className="flex-1">
         {/* Brand + Ask Mara button */}
-        <div className="flex items-center justify-between mb-3">
-          <div>
+        <div className="flex items-center justify-between mb-3 gap-2">
+          <button
+            onClick={onCollapse}
+            className="w-7 h-7 rounded-md text-[#888] hover:text-white hover:bg-[#3a3a42] flex items-center justify-center text-lg shrink-0"
+            aria-label="Hide controls"
+            title="Hide controls"
+          >
+            ›
+          </button>
+          <div className="flex-1">
             <div className="text-[18px] font-bold tracking-tight leading-tight text-[#d4af37]">
               MAKE REAL
             </div>
@@ -218,9 +227,12 @@ export default function App() {
 
   const [askMaraOpen, setAskMaraOpen] = useState(false);
 
-  // Control-panel layout state — resizable in wide mode, overlay drawer in narrow
+  // Control-panel layout state — collapse, resizable, narrow-window overlay
   const NARROW_BREAKPOINT = 1100;
-  const [overlayOpen, setOverlayOpen] = useState(false); // narrow-window only
+  const [panelOpen, setPanelOpen] = useState(() => {
+    if (typeof window === 'undefined') return true;
+    return localStorage.getItem('ribmaker_panel_open') !== 'false';
+  });
   const [panelWidth, setPanelWidth] = useState(() => {
     if (typeof window === 'undefined') return 340;
     const saved = parseInt(localStorage.getItem('ribmaker_panel_width') || '', 10);
@@ -235,12 +247,11 @@ export default function App() {
     return () => window.removeEventListener('resize', onResize);
   }, []);
   useEffect(() => {
+    localStorage.setItem('ribmaker_panel_open', String(panelOpen));
+  }, [panelOpen]);
+  useEffect(() => {
     localStorage.setItem('ribmaker_panel_width', String(panelWidth));
   }, [panelWidth]);
-  // Clear any old "panel collapsed" preference from the previous version
-  useEffect(() => {
-    if (typeof window !== 'undefined') localStorage.removeItem('ribmaker_panel_open');
-  }, []);
 
   const handleResizeStart = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
@@ -299,8 +310,8 @@ export default function App() {
         cameraRef={cameraRef}
       />
 
-      {/* Right: Controls panel — always docked in wide mode, with resize handle */}
-      {!isNarrow && (
+      {/* Right: Controls panel — docked, with resize handle and collapse */}
+      {!isNarrow && panelOpen && (
         <div className="relative flex shrink-0">
           <div
             onMouseDown={handleResizeStart}
@@ -340,15 +351,28 @@ export default function App() {
             sceneRef={sceneRef}
             cameraRef={cameraRef}
             onOpenAskMara={() => setAskMaraOpen(true)}
+            onCollapse={() => setPanelOpen(false)}
             panelWidth={panelWidth}
           />
         </div>
       )}
 
-      {/* Narrow window: floating button to open panel as overlay */}
-      {isNarrow && !overlayOpen && (
+      {/* Collapsed tab — wide window, panel hidden */}
+      {!isNarrow && !panelOpen && (
         <button
-          onClick={() => setOverlayOpen(true)}
+          onClick={() => setPanelOpen(true)}
+          className="fixed top-1/2 right-0 -translate-y-1/2 bg-[#3a3a42] hover:bg-[#5a5a62] text-white px-2.5 py-8 rounded-l-md shadow-lg z-40 border border-r-0 border-[#5a5a62]"
+          aria-label="Show controls"
+          title="Show controls"
+        >
+          ‹
+        </button>
+      )}
+
+      {/* Narrow window: floating button to open panel as overlay */}
+      {isNarrow && !panelOpen && (
+        <button
+          onClick={() => setPanelOpen(true)}
           className="fixed bottom-6 right-6 bg-gradient-to-br from-[#d4af37] to-[#b8941f] text-white rounded-full px-5 py-3 shadow-[0_4px_20px_rgba(212,175,55,0.4)] z-40 font-semibold text-sm flex items-center gap-2"
         >
           <span className="text-base">⚙</span> Controls
@@ -356,11 +380,11 @@ export default function App() {
       )}
 
       {/* Narrow window: panel as fixed overlay */}
-      {isNarrow && overlayOpen && (
+      {isNarrow && panelOpen && (
         <>
           <div
             className="fixed inset-0 bg-black/40 z-40"
-            onClick={() => setOverlayOpen(false)}
+            onClick={() => setPanelOpen(false)}
           />
           <div className="fixed top-0 right-0 h-screen z-50 shadow-[-8px_0_32px_rgba(0,0,0,0.4)]">
             <RightPanel
@@ -396,6 +420,7 @@ export default function App() {
               sceneRef={sceneRef}
               cameraRef={cameraRef}
               onOpenAskMara={() => setAskMaraOpen(true)}
+              onCollapse={() => setPanelOpen(false)}
               panelWidth={Math.min(panelWidth, 360)}
             />
           </div>
