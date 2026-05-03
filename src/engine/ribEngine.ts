@@ -75,6 +75,16 @@ export function clearImageData() {
   imageCtx = null;
 }
 
+// Feed pixels from any canvas into the rib-depth sampler (used by Pattern Studio)
+export function loadImageDataFromCanvas(src: HTMLCanvasElement) {
+  imageCanvas = document.createElement('canvas');
+  imageCanvas.width = src.width;
+  imageCanvas.height = src.height;
+  imageCtx = imageCanvas.getContext('2d')!;
+  imageCtx.drawImage(src, 0, 0);
+  imageData = imageCtx.getImageData(0, 0, src.width, src.height);
+}
+
 export function hasImageData(): boolean {
   return imageData !== null;
 }

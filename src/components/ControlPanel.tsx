@@ -8,6 +8,7 @@ import type {
 import { WAVE_TYPES } from '../engine/types';
 import { loadImageData, clearImageData, hasImageData, loadImageFromUrl } from '../engine/ribEngine';
 import { PATTERNS } from '../engine/patterns';
+import PatternStudio from './PatternStudio';
 
 interface ControlPanelProps {
   params: RibParams;
@@ -349,6 +350,19 @@ export default function ControlPanel(props: ControlPanelProps) {
             </button>
           ))}
         </div>
+      </Section>
+
+      {/* Pattern Studio — parametric generator */}
+      <Section title="Pattern Studio" defaultOpen={false}>
+        <p className="text-[11px] text-[#aaa] mb-2 leading-relaxed">
+          Dial in your own pattern. Live preview updates as you turn the knobs — hit Apply to use it as the rib depth map.
+        </p>
+        <PatternStudio
+          onApply={() => {
+            setImagePreviewSrc('pattern-studio');
+            onImageModeChange(true);
+          }}
+        />
       </Section>
 
       {/* Image Upload */}
