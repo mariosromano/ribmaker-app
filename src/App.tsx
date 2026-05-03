@@ -218,16 +218,26 @@ export default function App() {
 
   const [askMaraOpen, setAskMaraOpen] = useState(false);
 
-  // Control-panel is always docked; user can drag-resize its width
+  // Control-panel layout state — resizable in wide mode, overlay drawer in narrow
+  const NARROW_BREAKPOINT = 1100;
+  const [overlayOpen, setOverlayOpen] = useState(false); // narrow-window only
   const [panelWidth, setPanelWidth] = useState(() => {
     if (typeof window === 'undefined') return 340;
     const saved = parseInt(localStorage.getItem('ribmaker_panel_width') || '', 10);
     return Number.isFinite(saved) && saved >= 280 && saved <= 500 ? saved : 340;
   });
+  const [isNarrow, setIsNarrow] = useState(() =>
+    typeof window !== 'undefined' ? window.innerWidth < NARROW_BREAKPOINT : false,
+  );
+  useEffect(() => {
+    const onResize = () => setIsNarrow(window.innerWidth < NARROW_BREAKPOINT);
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
   useEffect(() => {
     localStorage.setItem('ribmaker_panel_width', String(panelWidth));
   }, [panelWidth]);
-  // Clean up stale flags from earlier panel-state experiments
+  // Clear any old "panel collapsed" preference from the previous version
   useEffect(() => {
     if (typeof window !== 'undefined') localStorage.removeItem('ribmaker_panel_open');
   }, []);
@@ -289,49 +299,108 @@ export default function App() {
         cameraRef={cameraRef}
       />
 
-      {/* Right: Controls panel — always docked, with drag-resize handle */}
-      <div className="relative flex shrink-0">
-        <div
-          onMouseDown={handleResizeStart}
-          className="w-1 hover:w-1.5 hover:bg-[#7c9bff] cursor-ew-resize transition-all"
-          title="Drag to resize"
-        />
-        <RightPanel
-          params={params}
-          onParamsChange={setParams}
-          installationMode={installationMode}
-          onInstallationModeChange={setInstallationMode}
-          lightingPreset={lightingPreset}
-          onLightingPresetChange={setLightingPreset}
-          ledEnabled={ledEnabled}
-          onLedEnabledChange={setLedEnabled}
-          ledColorStart={ledColorStart}
-          onLedColorStartChange={setLedColorStart}
-          ledColorEnd={ledColorEnd}
-          onLedColorEndChange={setLedColorEnd}
-          ledIntensity={ledIntensity}
-          onLedIntensityChange={setLedIntensity}
-          backdropColor={backdropColor}
-          onBackdropColorChange={setBackdropColor}
-          bgColor={bgColor}
-          onBgColorChange={setBgColor}
-          floorEnabled={floorEnabled}
-          onFloorEnabledChange={setFloorEnabled}
-          wallpaperEnabled={wallpaperEnabled}
-          onWallpaperEnabledChange={setWallpaperEnabled}
-          scaleFigureEnabled={scaleFigureEnabled}
-          onScaleFigureEnabledChange={setScaleFigureEnabled}
-          imageScale={imageScale}
-          onImageScaleChange={setImageScale}
-          onImageModeChange={handleImageModeChange}
-          ribProfiles={ribProfiles}
-          rendererRef={rendererRef}
-          sceneRef={sceneRef}
-          cameraRef={cameraRef}
-          onOpenAskMara={() => setAskMaraOpen(true)}
-          panelWidth={panelWidth}
-        />
-      </div>
+      {/* Right: Controls panel — always docked in wide mode, with resize handle */}
+      {!isNarrow && (
+        <div className="relative flex shrink-0">
+          <div
+            onMouseDown={handleResizeStart}
+            className="w-1 hover:w-1.5 hover:bg-[#7c9bff] cursor-ew-resize transition-all"
+            title="Drag to resize"
+          />
+          <RightPanel
+            params={params}
+            onParamsChange={setParams}
+            installationMode={installationMode}
+            onInstallationModeChange={setInstallationMode}
+            lightingPreset={lightingPreset}
+            onLightingPresetChange={setLightingPreset}
+            ledEnabled={ledEnabled}
+            onLedEnabledChange={setLedEnabled}
+            ledColorStart={ledColorStart}
+            onLedColorStartChange={setLedColorStart}
+            ledColorEnd={ledColorEnd}
+            onLedColorEndChange={setLedColorEnd}
+            ledIntensity={ledIntensity}
+            onLedIntensityChange={setLedIntensity}
+            backdropColor={backdropColor}
+            onBackdropColorChange={setBackdropColor}
+            bgColor={bgColor}
+            onBgColorChange={setBgColor}
+            floorEnabled={floorEnabled}
+            onFloorEnabledChange={setFloorEnabled}
+            wallpaperEnabled={wallpaperEnabled}
+            onWallpaperEnabledChange={setWallpaperEnabled}
+            scaleFigureEnabled={scaleFigureEnabled}
+            onScaleFigureEnabledChange={setScaleFigureEnabled}
+            imageScale={imageScale}
+            onImageScaleChange={setImageScale}
+            onImageModeChange={handleImageModeChange}
+            ribProfiles={ribProfiles}
+            rendererRef={rendererRef}
+            sceneRef={sceneRef}
+            cameraRef={cameraRef}
+            onOpenAskMara={() => setAskMaraOpen(true)}
+            panelWidth={panelWidth}
+          />
+        </div>
+      )}
+
+      {/* Narrow window: floating button to open panel as overlay */}
+      {isNarrow && !overlayOpen && (
+        <button
+          onClick={() => setOverlayOpen(true)}
+          className="fixed bottom-6 right-6 bg-gradient-to-br from-[#d4af37] to-[#b8941f] text-white rounded-full px-5 py-3 shadow-[0_4px_20px_rgba(212,175,55,0.4)] z-40 font-semibold text-sm flex items-center gap-2"
+        >
+          <span className="text-base">⚙</span> Controls
+        </button>
+      )}
+
+      {/* Narrow window: panel as fixed overlay */}
+      {isNarrow && overlayOpen && (
+        <>
+          <div
+            className="fixed inset-0 bg-black/40 z-40"
+            onClick={() => setOverlayOpen(false)}
+          />
+          <div className="fixed top-0 right-0 h-screen z-50 shadow-[-8px_0_32px_rgba(0,0,0,0.4)]">
+            <RightPanel
+              params={params}
+              onParamsChange={setParams}
+              installationMode={installationMode}
+              onInstallationModeChange={setInstallationMode}
+              lightingPreset={lightingPreset}
+              onLightingPresetChange={setLightingPreset}
+              ledEnabled={ledEnabled}
+              onLedEnabledChange={setLedEnabled}
+              ledColorStart={ledColorStart}
+              onLedColorStartChange={setLedColorStart}
+              ledColorEnd={ledColorEnd}
+              onLedColorEndChange={setLedColorEnd}
+              ledIntensity={ledIntensity}
+              onLedIntensityChange={setLedIntensity}
+              backdropColor={backdropColor}
+              onBackdropColorChange={setBackdropColor}
+              bgColor={bgColor}
+              onBgColorChange={setBgColor}
+              floorEnabled={floorEnabled}
+              onFloorEnabledChange={setFloorEnabled}
+              wallpaperEnabled={wallpaperEnabled}
+              onWallpaperEnabledChange={setWallpaperEnabled}
+              scaleFigureEnabled={scaleFigureEnabled}
+              onScaleFigureEnabledChange={setScaleFigureEnabled}
+              imageScale={imageScale}
+              onImageScaleChange={setImageScale}
+              onImageModeChange={handleImageModeChange}
+              ribProfiles={ribProfiles}
+              rendererRef={rendererRef}
+              sceneRef={sceneRef}
+              cameraRef={cameraRef}
+              onOpenAskMara={() => setAskMaraOpen(true)}
+              panelWidth={Math.min(panelWidth, 360)}
+            />
+          </div>
+        </>
+      )}
 
       {/* Ask Mara drawer — fixed overlay, only mounted when open */}
       {askMaraOpen && (
