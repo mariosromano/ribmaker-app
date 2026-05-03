@@ -616,31 +616,39 @@ export default function Viewport3D({
         return Math.max(distH, distW) * padding;
       };
 
+      // Snap camera + target + up vector + reset OrbitControls state cleanly
+      const snap = (pos: [number, number, number], tgt: [number, number, number], up: [number, number, number] = [0, 1, 0]) => {
+        camera.up.set(up[0], up[1], up[2]);
+        camera.position.set(pos[0], pos[1], pos[2]);
+        controls.target.set(tgt[0], tgt[1], tgt[2]);
+        camera.lookAt(controls.target);
+        camera.updateProjectionMatrix();
+        controls.update();
+      };
+
       switch (view) {
         case 'front': {
+          // Look down -X axis at the wall (wall lies in YZ plane)
           const d = fitDistance(totalWidth, wallH);
-          camera.position.set(maxD + d, centerY, 0);
-          controls.target.set(0, centerY, 0);
+          snap([maxD + d, centerY, 0], [0, centerY, 0]);
           break;
         }
         case 'top': {
+          // Look down -Y axis (camera above, looking down)
           const d = fitDistance(totalWidth, maxD);
-          camera.position.set(0, d, 0);
-          controls.target.set(0, 0, 0);
+          snap([0, d, 0], [0, 0, 0], [0, 0, -1]);
           break;
         }
         case 'side': {
+          // Look down -Z axis at one end of the wall
           const d = fitDistance(maxD, wallH);
-          camera.position.set(maxD / 2, centerY, d);
-          controls.target.set(maxD / 2, centerY, 0);
+          snap([maxD / 2, centerY, d], [maxD / 2, centerY, 0]);
           break;
         }
         case 'perspective':
-          camera.position.set(15, 10, 25);
-          controls.target.set(0, centerY, 0);
+          snap([15, 10, 25], [0, centerY, 0]);
           break;
       }
-      controls.update();
     };
   }, [params]);
 
