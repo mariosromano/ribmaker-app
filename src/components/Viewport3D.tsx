@@ -652,14 +652,19 @@ export default function Viewport3D({
           break;
         }
         case 'perspective': {
-          // Pull camera mostly straight in front of wall, slight side + up
-          // for 3D feel. Distance scales with wall size so the wall always
-          // fits comfortably in frame.
-          const d = fitDistance(totalWidth, wallH, 1.4);
+          // Compute distance using a SAFE aspect (clamp to 16:9 worst-case)
+          // so wide browser windows don't pull the camera too close.
+          const safeAspect = Math.max(camera.aspect, 1.6);
+          const vFov = (camera.fov * Math.PI) / 180;
+          const halfTan = Math.tan(vFov / 2);
+          const distH = (wallH / 2) / halfTan;
+          const distW = (totalWidth / 2) / (halfTan * safeAspect);
+          const d = Math.max(distH, distW) * 1.7; // generous padding for the angle
+
           camera.position.set(
-            maxD + d,            // mostly in front of wall (along +X)
-            centerY + wallH * 0.25, // slightly above center
-            totalWidth * 0.18,   // small side offset for 3D feel (NOT half-wall)
+            maxD + d,                   // straight in front of wall
+            centerY + wallH * 0.18,     // mild down-angle
+            totalWidth * 0.10,          // very subtle side offset for 3D feel
           );
           controls.target.set(0, centerY, 0);
           controls.update();
