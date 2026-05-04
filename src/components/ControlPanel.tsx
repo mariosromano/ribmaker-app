@@ -138,8 +138,6 @@ export default function ControlPanel(props: ControlPanelProps) {
     onParamsChange,
     installationMode,
     onInstallationModeChange,
-    lightingPreset,
-    onLightingPresetChange,
     backdropColor,
     onBackdropColorChange,
     bgColor,
@@ -616,25 +614,6 @@ export default function ControlPanel(props: ControlPanelProps) {
         </div>
       </Section>
 
-      {/* Lighting */}
-      <Section title="Lighting">
-        <div className="grid grid-cols-2 gap-1.5">
-          {(['standard', 'dramatic', 'sunset', 'cool', 'night'] as LightingPreset[]).map((preset) => (
-            <button
-              key={preset}
-              className={`py-2 px-1.5 text-[10px] rounded-md font-medium transition-colors ${
-                lightingPreset === preset
-                  ? 'bg-[#7c9bff] text-white'
-                  : 'bg-[#4a4a52] hover:bg-[#5a5a62] text-white'
-              }`}
-              onClick={() => onLightingPresetChange(preset)}
-            >
-              {preset === 'cool' ? 'Cool Studio' : preset.charAt(0).toUpperCase() + preset.slice(1)}
-            </button>
-          ))}
-        </div>
-
-      </Section>
 
       {/* Advanced Settings toggle */}
       <button

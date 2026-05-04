@@ -26,21 +26,21 @@ export default function InfoBar({ params, installationMode, ledEnabled }: InfoBa
       <div className="text-[9px] text-[#666] uppercase tracking-wider px-1">Internal · for verification</div>
 
       {/* Dimensions */}
-      <div className="font-mono text-[11px] text-[#888] p-2.5 bg-[#1a1a1f] rounded leading-[1.8]">
-        <strong className="text-[#aaa]">Number of Ribs:</strong> {params.count}<br />
-        <strong className="text-[#aaa]">Min Depth:</strong> {params.minDepth}"{' '}
-        | <strong className="text-[#aaa]">Max Depth:</strong> {params.maxDepth}"<br />
-        <strong className="text-[#aaa]">Total Array Width:</strong>{' '}
+      <div className="font-mono text-[13px] text-[#bbb] p-3 bg-[#1a1a1f] rounded leading-[1.8]">
+        <strong className="text-white">Number of Ribs:</strong> {params.count}<br />
+        <strong className="text-white">Min Depth:</strong> {params.minDepth}"{' '}
+        | <strong className="text-white">Max Depth:</strong> {params.maxDepth}"<br />
+        <strong className="text-white">Total Array Width:</strong>{' '}
         {pricing.totalWidth.toFixed(1)}" ({(pricing.totalWidth / 12).toFixed(1)}')
         <br />
-        <strong className="text-[#aaa]">Wall Coverage:</strong> {pricing.wallCoverage}<br />
-        <strong className="text-[#aaa]">Surface Area:</strong> {pricing.totalSurfaceAreaSqFt.toFixed(1)} sf
+        <strong className="text-white">Wall Coverage:</strong> {pricing.wallCoverage}<br />
+        <strong className="text-white">Surface Area:</strong> {pricing.totalSurfaceAreaSqFt.toFixed(1)} sf
       </div>
 
       {/* Material Sheets */}
-      <div className="font-mono text-[11px] text-[#888] p-2 bg-[#1a1a1f] rounded leading-[1.8]">
-        <strong className="text-[#aaa]">Material Sheets</strong>{' '}
-        <small>(48" × 144" Corian)</small>
+      <div className="font-mono text-[13px] text-[#bbb] p-3 bg-[#1a1a1f] rounded leading-[1.8]">
+        <strong className="text-white">Material Sheets</strong>{' '}
+        <span className="text-[11px] text-[#888]">(48" × 144" Corian)</span>
         <br />
         <strong>Ribs/sheet:</strong> {pricing.ribsPerSheet} |{' '}
         <strong>Sheets needed:</strong>{' '}
@@ -48,28 +48,28 @@ export default function InfoBar({ params, installationMode, ledEnabled }: InfoBa
         {pricing.sectionsPerRib > 1 && ` (spliced, ${pricing.sectionsPerRib} sections/rib)`}
         <br />
         <strong>Sheet price:</strong> {fmt(pricePerSheet)}/sheet{' '}
-        <small>(total ÷ {pricing.sheetsNeeded})</small>
+        <span className="text-[11px] text-[#888]">(total ÷ {pricing.sheetsNeeded})</span>
       </div>
 
       {/* Pricing */}
-      <div className="bg-[#2d4a2d] rounded-md p-3 font-mono text-[11px] leading-[1.8]">
-        <strong className="text-[#aaa]">Estimated Price</strong>
+      <div className="bg-[#2d4a2d] rounded-md p-3.5 font-mono text-[14px] leading-[1.8]">
+        <strong className="text-white text-[15px]">Estimated Price</strong>
         <br />
-        <strong className="text-[#aaa]">Ribs:</strong>{' '}
+        <strong className="text-white">Ribs:</strong>{' '}
         {pricing.totalSurfaceAreaSqFt.toFixed(1)} sf @ $45/sf{' '}
-        <small>(incl. hardware)</small> = {fmt(pricing.ribPrice)}
+        <span className="text-[12px] text-[#bfeebf]">(incl. hardware)</span> = {fmt(pricing.ribPrice)}
         <br />
         {ledEnabled && (
           <>
-            <strong className="text-[#aaa]">LED:</strong>{' '}
+            <strong className="text-white">LED:</strong>{' '}
             {pricing.ledLinearFeet.toFixed(1)} lf @ $30/lf = {fmt(pricing.ledPrice)}
             <br />
           </>
         )}
-        <strong className="text-[#aaa]">Per rib:</strong> {fmt(pricePerRib)}{' '}
-        <small>(total ÷ {params.count})</small>
+        <strong className="text-white">Per rib:</strong> {fmt(pricePerRib)}{' '}
+        <span className="text-[12px] text-[#bfeebf]">(total ÷ {params.count})</span>
         <br />
-        <span className="text-lg font-bold text-[#8eff8e]">{fmt(pricing.totalPrice)}</span>
+        <span className="text-[28px] font-bold text-[#8eff8e]">{fmt(pricing.totalPrice)}</span>
       </div>
     </div>
   );
