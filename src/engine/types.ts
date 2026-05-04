@@ -31,12 +31,17 @@ export type LightingPreset = 'standard' | 'dramatic' | 'sunset' | 'cool' | 'nigh
 export const WAVE_TYPES = ['Sine', 'Smooth', 'Sharp'] as const;
 
 export const SCALE = 0.1; // 1 inch = 0.1 units in 3D
-// $38/sf gives a clean 2× margin over our ~$19/sf landed cost:
-//   • Corian sheet ($500) + CNC milling ($300) = $800/sheet ÷ 48 sf = $16.67/sf material
-//   • Aluminum U-channel + brackets at $17/rib × ~5 ribs/sheet ÷ 48 sf ≈ $1.77/sf
-//   ≈ $19/sf landed cost · $38/sf retail · 2× margin
+// Retail
+//   $38/sf gives ~2× margin over our landed cost (see below)
 export const PRICE_PER_SF = 38;
 export const PRICE_LED_PER_LF = 30;
-export const SHEET_WIDTH = 48;   // inches
-export const SHEET_HEIGHT = 144; // inches
-export const SHEET_PRICE = 1800; // $ per sheet
+
+// Material — Corian sheet
+export const SHEET_WIDTH = 48;        // inches
+export const SHEET_HEIGHT = 144;      // inches (= 48 sf per sheet)
+export const SHEET_PRICE = 1800;      // $ per sheet (retail anchor — not used in margin calc)
+
+// COST inputs — used for margin / profit display
+export const COST_SHEET_BLANK = 500;  // $ per Corian sheet (material)
+export const COST_SHEET_CNC = 300;    // $ per sheet for CNC milling
+export const COST_HARDWARE_PER_RIB = 17; // U-channel + L-brackets + bolts per rib

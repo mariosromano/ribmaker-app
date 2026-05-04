@@ -17,6 +17,9 @@ import {
   SHEET_WIDTH,
   SHEET_HEIGHT,
   SHEET_PRICE,
+  COST_SHEET_BLANK,
+  COST_SHEET_CNC,
+  COST_HARDWARE_PER_RIB,
   WAVE_TYPES,
 } from './types';
 
@@ -403,6 +406,15 @@ export function calculatePricing(
   const sheetsNeeded = Math.ceil(totalSlots / ribsPerSheet);
   const sheetTotalCost = sheetsNeeded * SHEET_PRICE;
 
+  // ── Margin / profit (internal) ─────────────────────────────────
+  const costMaterial = sheetsNeeded * COST_SHEET_BLANK;          // raw Corian
+  const costCNC      = sheetsNeeded * COST_SHEET_CNC;            // milling
+  const costHardware = params.count * COST_HARDWARE_PER_RIB;     // U-channel + brackets
+  const totalCost    = costMaterial + costCNC + costHardware;
+  const profit       = Math.max(0, totalPrice - totalCost);
+  const marginPct    = totalPrice > 0 ? (profit / totalPrice) * 100 : 0;
+  const markupPct    = totalCost > 0 ? (profit / totalCost) * 100 : 0;
+
   let wallCoverage: string;
   if (installationMode === 'both') {
     wallCoverage =
@@ -425,6 +437,14 @@ export function calculatePricing(
     sheetsNeeded,
     sheetTotalCost,
     wallCoverage,
+    // Margin / profit
+    costMaterial,
+    costCNC,
+    costHardware,
+    totalCost,
+    profit,
+    marginPct,
+    markupPct,
   };
 }
 
