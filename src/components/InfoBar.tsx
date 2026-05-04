@@ -56,7 +56,7 @@ export default function InfoBar({ params, installationMode, ledEnabled }: InfoBa
         <strong className="text-white text-[15px]">Estimated Price</strong>
         <br />
         <strong className="text-white">Ribs:</strong>{' '}
-        {pricing.totalSurfaceAreaSqFt.toFixed(1)} sf @ $45/sf{' '}
+        {pricing.totalSurfaceAreaSqFt.toFixed(1)} sf @ $38/sf{' '}
         <span className="text-[12px] text-[#bfeebf]">(incl. hardware)</span> = {fmt(pricing.ribPrice)}
         <br />
         {ledEnabled && (
