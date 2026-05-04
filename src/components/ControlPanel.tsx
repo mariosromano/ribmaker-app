@@ -140,14 +140,6 @@ export default function ControlPanel(props: ControlPanelProps) {
     onInstallationModeChange,
     lightingPreset,
     onLightingPresetChange,
-    ledEnabled,
-    onLedEnabledChange,
-    ledColorStart,
-    onLedColorStartChange,
-    ledColorEnd,
-    onLedColorEndChange,
-    ledIntensity,
-    onLedIntensityChange,
     backdropColor,
     onBackdropColorChange,
     bgColor,
@@ -642,42 +634,6 @@ export default function ControlPanel(props: ControlPanelProps) {
           ))}
         </div>
 
-        <div className="mt-3 pt-3 border-t border-[#555]">
-          <Toggle label="LED Strip Lighting" checked={ledEnabled} onChange={onLedEnabledChange} />
-
-          {ledEnabled && (
-            <div>
-              <div className="flex gap-2 mb-2">
-                <div className="flex-1">
-                  <label className="block text-[10px] text-[#888] mb-1">LED Start Color</label>
-                  <input
-                    type="color"
-                    className="w-full h-[30px] border-none rounded cursor-pointer bg-transparent"
-                    value={ledColorStart}
-                    onChange={(e) => onLedColorStartChange(e.target.value)}
-                  />
-                </div>
-                <div className="flex-1">
-                  <label className="block text-[10px] text-[#888] mb-1">LED End Color</label>
-                  <input
-                    type="color"
-                    className="w-full h-[30px] border-none rounded cursor-pointer bg-transparent"
-                    value={ledColorEnd}
-                    onChange={(e) => onLedColorEndChange(e.target.value)}
-                  />
-                </div>
-              </div>
-              <Slider
-                label="LED Intensity"
-                value={ledIntensity}
-                min={0.1}
-                max={3}
-                step={0.1}
-                onChange={onLedIntensityChange}
-              />
-            </div>
-          )}
-        </div>
       </Section>
 
       {/* Advanced Settings toggle */}
