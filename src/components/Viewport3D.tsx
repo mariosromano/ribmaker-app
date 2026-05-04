@@ -398,17 +398,20 @@ export default function Viewport3D({
 
     onRibProfilesGenerated(ribProfiles);
 
-    // Keep orbit pivot at wall center as wall height changes. Only Y is
-    // updated — preserves any horizontal pan the user has done.
+    // Keep orbit pivot at wall center as wall height changes (Y only —
+    // preserves any horizontal pan the user has done).
     if (controlsRef.current) {
       const wallCenterY = (params.height * SCALE) / 2;
       controlsRef.current.target.y = wallCenterY;
     }
 
-    // First time we have ribs, snap camera to a clean 3D framed view
+    // First time we have ribs, snap camera to a clean 3D framed view —
+    // BUT only if the user hasn't already clicked a view button. Race
+    // protection so the initial snap can't override a user click.
     if (!didInitialFrameRef.current && ribProfiles.length > 0) {
       didInitialFrameRef.current = true;
       requestAnimationFrame(() => {
+        if ((window as any).__ribmakerUserSelectedView) return;
         (window as any).__ribmakerSetView?.('perspective');
       });
     }
@@ -630,6 +633,10 @@ export default function Viewport3D({
       const camera = cameraRef.current;
       const controls = controlsRef.current;
       if (!camera || !controls) return;
+
+      // Mark that a view has been set — race protection against deferred
+      // initial-frame snap (see rib-generation effect).
+      (window as any).__ribmakerUserSelectedView = true;
 
       const totalWidth = (params.count - 1) * params.spacing * SCALE;
       const wallH = params.height * SCALE;
