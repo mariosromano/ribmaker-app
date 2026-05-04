@@ -473,17 +473,18 @@ export default function ControlPanel(props: ControlPanelProps) {
         <Slider
           label="Rib Height"
           value={params.height}
-          min={40}
+          min={72}
           max={144}
           step={1}
           format={(v) => `${v}"`}
           onChange={(v) => updateParam('height', v)}
+          info="6'–12' tall (1 sheet height); 6' = 2 ribs/sheet vertically"
         />
         <Slider
           label="Min Depth (from wall)"
           value={params.minDepth}
           min={2}
-          max={30}
+          max={14}
           step={0.5}
           format={(v) => `${v}"`}
           onChange={(v) => updateParam('minDepth', v)}
@@ -492,7 +493,7 @@ export default function ControlPanel(props: ControlPanelProps) {
           label="Max Depth (from wall)"
           value={params.maxDepth}
           min={2}
-          max={30}
+          max={14}
           step={0.5}
           format={(v) => `${v}"`}
           onChange={(v) => updateParam('maxDepth', v)}

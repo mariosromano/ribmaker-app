@@ -391,11 +391,16 @@ export function calculatePricing(
   const ledPrice = ledLinearFeet * PRICE_LED_PER_LF;
   const totalPrice = ribPrice + (ledEnabled ? ledPrice : 0);
 
-  // Sheet calculation (48" × 144" sheets, splice for longer ribs)
-  const ribsPerSheet = Math.floor(SHEET_WIDTH / params.maxDepth);
+  // Sheet calculation (48" × 144" sheets)
+  //   • Across the 48" width: each rib uses (maxDepth) of width → ribsPerColumn
+  //   • Along the 144" height: short ribs stack (e.g. two 72" ribs per column)
+  //   • Tall ribs > 144": splice into vertical sections
+  const ribsPerColumn = Math.floor(SHEET_WIDTH / params.maxDepth);
+  const ribsStackedPerColumn = Math.max(1, Math.floor(SHEET_HEIGHT / ribLength));
   const sectionsPerRib = Math.ceil(ribLength / SHEET_HEIGHT);
+  const ribsPerSheet = Math.max(1, ribsPerColumn * ribsStackedPerColumn);
   const totalSlots = params.count * sectionsPerRib;
-  const sheetsNeeded = Math.ceil(totalSlots / Math.max(ribsPerSheet, 1));
+  const sheetsNeeded = Math.ceil(totalSlots / ribsPerSheet);
   const sheetTotalCost = sheetsNeeded * SHEET_PRICE;
 
   let wallCoverage: string;
