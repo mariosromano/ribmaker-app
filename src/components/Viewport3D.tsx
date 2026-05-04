@@ -106,7 +106,14 @@ export default function Viewport3D({
     // Controls
     const controls = new OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
-    controls.dampingFactor = 0.05;
+    controls.dampingFactor = 0.12;       // a bit snappier than default 0.05
+    controls.rotateSpeed = 0.7;          // slower rotation feels more controlled
+    controls.zoomSpeed = 0.8;
+    controls.panSpeed = 0.8;
+    controls.minDistance = 2;            // don't let user zoom inside the wall
+    controls.maxDistance = 200;
+    controls.maxPolarAngle = Math.PI * 0.95; // can't quite go fully under the floor
+    controls.minPolarAngle = 0.01;       // can't go through the top pole
     controlsRef.current = controls;
 
     // Rib group container
@@ -386,18 +393,17 @@ export default function Viewport3D({
 
     onRibProfilesGenerated(ribProfiles);
 
-    // Always keep the orbit pivot at the wall's vertical center — otherwise
-    // OrbitControls rotates around (0,0,0) (the floor), making the wall
-    // swing around its base instead of its center.
-    if (controlsRef.current) {
-      const wallCenterY = (params.height * SCALE) / 2;
-      controlsRef.current.target.set(0, wallCenterY, 0);
-      controlsRef.current.update();
-    }
-
-    // First time we have ribs, snap the camera to a clean 3D framed view of the wall
+    // First time we have ribs, set orbit pivot to wall center AND snap the
+    // camera to a clean 3D framed view. After this initial setup, never
+    // touch controls.target again from this effect — let the user freely
+    // orbit. View buttons (Front/Top/Side/3D) will reset target when clicked.
     if (!didInitialFrameRef.current && ribProfiles.length > 0) {
       didInitialFrameRef.current = true;
+      if (controlsRef.current) {
+        const wallCenterY = (params.height * SCALE) / 2;
+        controlsRef.current.target.set(0, wallCenterY, 0);
+        controlsRef.current.update();
+      }
       requestAnimationFrame(() => {
         (window as any).__ribmakerSetView?.('perspective');
       });
