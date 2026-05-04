@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef, useMemo } from 'react';
+import { useState, useCallback, useRef, useMemo, useEffect } from 'react';
 import * as THREE from 'three';
 import type {
   RibParams,
@@ -62,6 +62,7 @@ interface RightPanelProps {
   sceneRef: React.MutableRefObject<THREE.Scene | null>;
   cameraRef: React.MutableRefObject<THREE.PerspectiveCamera | null>;
   onOpenAskMara: () => void;
+  panelWidth: number;
 }
 
 function RightPanel(props: RightPanelProps) {
@@ -74,7 +75,7 @@ function RightPanel(props: RightPanelProps) {
     wallpaperEnabled, onWallpaperEnabledChange, scaleFigureEnabled,
     onScaleFigureEnabledChange, imageScale, onImageScaleChange,
     onImageModeChange, ribProfiles, rendererRef, sceneRef, cameraRef,
-    onOpenAskMara,
+    onOpenAskMara, panelWidth,
   } = props;
 
   const pricing = useMemo(
@@ -85,7 +86,10 @@ function RightPanel(props: RightPanelProps) {
     '$' + n.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
 
   return (
-    <div className="w-[340px] min-w-[340px] bg-[#2a2a30] h-screen overflow-y-auto py-5 px-6 flex flex-col">
+    <div
+      className="bg-[#2a2a30] h-screen overflow-y-auto py-5 px-6 flex flex-col"
+      style={{ width: panelWidth, minWidth: panelWidth }}
+    >
       <div className="flex-1">
         {/* Brand + Ask Mara button */}
         <div className="flex items-center justify-between mb-3">
@@ -214,6 +218,35 @@ export default function App() {
 
   const [askMaraOpen, setAskMaraOpen] = useState(false);
 
+  // Resizable panel — drag the left-edge handle to resize 280..500px
+  const [panelWidth, setPanelWidth] = useState(() => {
+    if (typeof window === 'undefined') return 340;
+    const saved = parseInt(localStorage.getItem('ribmaker_panel_width') || '', 10);
+    return Number.isFinite(saved) && saved >= 280 && saved <= 500 ? saved : 340;
+  });
+  useEffect(() => {
+    localStorage.setItem('ribmaker_panel_width', String(panelWidth));
+  }, [panelWidth]);
+  const handleResizeStart = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    const startX = e.clientX;
+    const startWidth = panelWidth;
+    const onMove = (ev: MouseEvent) => {
+      const dx = startX - ev.clientX; // dragging left widens
+      setPanelWidth(Math.max(280, Math.min(500, startWidth + dx)));
+    };
+    const onUp = () => {
+      window.removeEventListener('mousemove', onMove);
+      window.removeEventListener('mouseup', onUp);
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+    };
+    document.body.style.cursor = 'ew-resize';
+    document.body.style.userSelect = 'none';
+    window.addEventListener('mousemove', onMove);
+    window.addEventListener('mouseup', onUp);
+  }, [panelWidth]);
+
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
   const sceneRef = useRef<THREE.Scene | null>(null);
   const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
@@ -250,7 +283,12 @@ export default function App() {
         cameraRef={cameraRef}
       />
 
-      {/* Right: Controls panel — always visible */}
+      {/* Right: drag-handle + Controls panel — always docked */}
+      <div
+        onMouseDown={handleResizeStart}
+        className="w-1 hover:w-1.5 hover:bg-[#7c9bff] cursor-ew-resize transition-all shrink-0"
+        title="Drag to resize"
+      />
       <RightPanel
         params={params}
         onParamsChange={setParams}
@@ -284,6 +322,7 @@ export default function App() {
         sceneRef={sceneRef}
         cameraRef={cameraRef}
         onOpenAskMara={() => setAskMaraOpen(true)}
+        panelWidth={panelWidth}
       />
 
       {/* Ask Mara drawer — fixed overlay, only mounted when open */}
