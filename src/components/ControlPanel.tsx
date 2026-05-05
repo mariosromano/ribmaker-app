@@ -457,16 +457,40 @@ export default function ControlPanel(props: ControlPanelProps) {
 
       {/* Rib Dimensions */}
       <Section title="Rib Dimensions">
-        <Slider
-          label="Rib Height"
-          value={params.height}
-          min={72}
-          max={144}
-          step={1}
-          format={(v) => `${v}"`}
-          onChange={(v) => updateParam('height', v)}
-          info="6'–12' tall (1 sheet height); 6' = 2 ribs/sheet vertically"
-        />
+        {/* Rib Height — snap to clean sheet-utilization heights.
+            6' = 2 ribs stacked per column · 8'/9' = drop available
+            for composing future ribs · 12' = full column, no drop. */}
+        <div className="mb-3">
+          <label className="flex justify-between mb-1 text-[11px] text-[#ccc]">
+            <span>Rib Height</span>
+            <span className="text-[#7c9bff] font-medium font-mono">
+              {Math.floor(params.height / 12)}'{params.height % 12 ? ` ${params.height % 12}"` : ''}
+            </span>
+          </label>
+          <div className="grid grid-cols-4 gap-1.5">
+            {[
+              { in: 72,  label: "6'" },
+              { in: 96,  label: "8'" },
+              { in: 108, label: "9'" },
+              { in: 144, label: "12'" },
+            ].map((h) => (
+              <button
+                key={h.in}
+                onClick={() => updateParam('height', h.in)}
+                className={`py-2 text-[11px] rounded-md font-medium transition-colors ${
+                  params.height === h.in
+                    ? 'bg-[#7c9bff] text-white'
+                    : 'bg-[#4a4a52] hover:bg-[#5a5a62] text-white'
+                }`}
+              >
+                {h.label}
+              </button>
+            ))}
+          </div>
+          <p className="text-[10px] text-[#666] mt-1">
+            Standard heights — sheet-friendly (12' is one slab, 6' fits two per column).
+          </p>
+        </div>
         <Slider
           label="Min Depth (from wall)"
           value={params.minDepth}
