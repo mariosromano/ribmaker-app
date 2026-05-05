@@ -1,0 +1,176 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 720" font-family="Helvetica, Arial, sans-serif">
+  <!-- Background -->
+  <rect width="1200" height="720" fill="#1a1a1f"/>
+
+  <!-- Title -->
+  <text x="600" y="44" font-size="24" font-weight="700" fill="#fff" text-anchor="middle">Sheet Packing — How to Get More Ribs Per Sheet</text>
+  <text x="600" y="70" font-size="13" fill="#888" text-anchor="middle">Each sheet is 48"×144" (4'×12'). Slice into vertical columns, each column = one rib's depth.</text>
+
+  <!-- Legend -->
+  <g transform="translate(40, 96)">
+    <rect width="14" height="14" fill="#7c9bff" rx="2"/>
+    <text x="22" y="11" font-size="11" fill="#ccc">Single-piece rib (best install quality)</text>
+    <rect x="280" width="14" height="14" fill="#d4af37" rx="2"/>
+    <text x="302" y="11" font-size="11" fill="#ccc">Composed rib (uses drop pieces)</text>
+    <rect x="540" width="14" height="14" fill="#3a3a42" stroke="#555" stroke-width="1" rx="2"/>
+    <text x="562" y="11" font-size="11" fill="#ccc">Drop / waste</text>
+    <rect x="720" width="14" height="14" fill="#444" stroke="#666" stroke-dasharray="2 2" rx="2"/>
+    <text x="742" y="11" font-size="11" fill="#ccc">Splice line</text>
+  </g>
+
+  <!-- Each column = one sheet column at 4'×12' shown as 80px × 480px (1ft = 40px) -->
+  <!-- Use only one column per height for clarity. Sheet is 4 columns wide; multiply at end. -->
+
+  <!-- ======= 6' walls ======= -->
+  <g transform="translate(80, 150)">
+    <text x="80" y="-12" font-size="16" font-weight="700" fill="#fff" text-anchor="middle">6'  TALL</text>
+    <text x="80" y="6" font-size="11" fill="#aaa" text-anchor="middle">Two ribs stack per column</text>
+
+    <!-- 12' tall sheet column, 80px wide, 480px tall (1' = 40px) -->
+    <rect x="40" y="20" width="80" height="480" fill="#2a2a2e" stroke="#555"/>
+    <!-- Top 6' rib -->
+    <rect x="40" y="20" width="80" height="240" fill="#7c9bff"/>
+    <text x="80" y="135" font-size="12" font-weight="700" fill="#fff" text-anchor="middle">RIB A</text>
+    <text x="80" y="152" font-size="10" fill="#fff" text-anchor="middle">6' single</text>
+    <!-- Splice line at 6' -->
+    <line x1="40" y1="260" x2="120" y2="260" stroke="#555" stroke-dasharray="2 2"/>
+    <!-- Bottom 6' rib -->
+    <rect x="40" y="260" width="80" height="240" fill="#7c9bff"/>
+    <text x="80" y="375" font-size="12" font-weight="700" fill="#fff" text-anchor="middle">RIB B</text>
+    <text x="80" y="392" font-size="10" fill="#fff" text-anchor="middle">6' single</text>
+
+    <!-- Result label -->
+    <g transform="translate(0, 520)">
+      <rect width="160" height="64" fill="#2d4a2d" rx="4"/>
+      <text x="80" y="22" font-size="12" font-weight="700" fill="#8eff8e" text-anchor="middle">2 ribs / column</text>
+      <text x="80" y="40" font-size="11" fill="#bfeebf" text-anchor="middle">0% waste · no splices</text>
+      <text x="80" y="56" font-size="10" fill="#bfeebf" text-anchor="middle">PERFECT FIT</text>
+    </g>
+  </g>
+
+  <!-- ======= 8' walls ======= -->
+  <g transform="translate(330, 150)">
+    <text x="100" y="-12" font-size="16" font-weight="700" fill="#fff" text-anchor="middle">8'  TALL</text>
+    <text x="100" y="6" font-size="11" fill="#aaa" text-anchor="middle">Compose: 1 single + 1 spliced (4'+4')</text>
+
+    <!-- Column A: single 8' + 4' drop -->
+    <g>
+      <rect x="20" y="20" width="80" height="480" fill="#2a2a2e" stroke="#555"/>
+      <rect x="20" y="20" width="80" height="320" fill="#7c9bff"/>
+      <text x="60" y="175" font-size="12" font-weight="700" fill="#fff" text-anchor="middle">RIB A</text>
+      <text x="60" y="192" font-size="10" fill="#fff" text-anchor="middle">8' single</text>
+      <!-- 4' drop -->
+      <rect x="20" y="340" width="80" height="160" fill="#3a3a42" stroke="#555" stroke-dasharray="2 2"/>
+      <text x="60" y="425" font-size="11" fill="#888" text-anchor="middle">drop 4'</text>
+      <text x="60" y="440" font-size="9" fill="#888" text-anchor="middle">(will reuse →)</text>
+    </g>
+
+    <!-- Arrow indicating reuse -->
+    <g transform="translate(105, 380)">
+      <path d="M 0 0 L 18 0 L 14 -4 M 18 0 L 14 4" stroke="#d4af37" stroke-width="2" fill="none"/>
+    </g>
+
+    <!-- Column B: composed (4'+4') -->
+    <g>
+      <rect x="125" y="20" width="80" height="480" fill="#2a2a2e" stroke="#555"/>
+      <rect x="125" y="20" width="80" height="160" fill="#d4af37"/>
+      <text x="165" y="100" font-size="11" font-weight="700" fill="#1a1a1f" text-anchor="middle">drop 4'</text>
+      <text x="165" y="115" font-size="9" fill="#1a1a1f" text-anchor="middle">from col A</text>
+      <line x1="125" y1="180" x2="205" y2="180" stroke="#444" stroke-dasharray="2 2"/>
+      <rect x="125" y="180" width="80" height="160" fill="#d4af37"/>
+      <text x="165" y="255" font-size="11" font-weight="700" fill="#1a1a1f" text-anchor="middle">drop 4'</text>
+      <text x="165" y="270" font-size="9" fill="#1a1a1f" text-anchor="middle">from col C</text>
+      <text x="165" y="290" font-size="11" font-weight="700" fill="#fff" text-anchor="middle" opacity="0">RIB B</text>
+      <!-- Annotation -->
+      <text x="165" y="320" font-size="11" font-weight="700" fill="#fff" text-anchor="middle">RIB B (8' composed)</text>
+      <!-- Bottom 8' single -->
+      <rect x="125" y="340" width="80" height="160" fill="#3a3a42" stroke="#555" stroke-dasharray="2 2"/>
+      <text x="165" y="425" font-size="11" fill="#888" text-anchor="middle">drop 4'</text>
+      <text x="165" y="440" font-size="9" fill="#888" text-anchor="middle">(→ next rib)</text>
+    </g>
+
+    <!-- Result label -->
+    <g transform="translate(20, 520)">
+      <rect width="185" height="64" fill="#2d4a2d" rx="4"/>
+      <text x="92" y="22" font-size="12" font-weight="700" fill="#8eff8e" text-anchor="middle">3 ribs / 2 columns</text>
+      <text x="92" y="40" font-size="11" fill="#bfeebf" text-anchor="middle">~30% fewer sheets</text>
+      <text x="92" y="56" font-size="10" fill="#bfeebf" text-anchor="middle">1 in 3 has midpoint splice</text>
+    </g>
+  </g>
+
+  <!-- ======= 9' walls ======= -->
+  <g transform="translate(635, 150)">
+    <text x="100" y="-12" font-size="16" font-weight="700" fill="#fff" text-anchor="middle">9'  TALL</text>
+    <text x="100" y="6" font-size="11" fill="#aaa" text-anchor="middle">Compose: 1 single + 1 spliced (6'+3')</text>
+
+    <!-- Column A: single 9' + 3' drop -->
+    <g>
+      <rect x="20" y="20" width="80" height="480" fill="#2a2a2e" stroke="#555"/>
+      <rect x="20" y="20" width="80" height="360" fill="#7c9bff"/>
+      <text x="60" y="195" font-size="12" font-weight="700" fill="#fff" text-anchor="middle">RIB A</text>
+      <text x="60" y="212" font-size="10" fill="#fff" text-anchor="middle">9' single</text>
+      <!-- 3' drop -->
+      <rect x="20" y="380" width="80" height="120" fill="#3a3a42" stroke="#555" stroke-dasharray="2 2"/>
+      <text x="60" y="445" font-size="11" fill="#888" text-anchor="middle">drop 3'</text>
+      <text x="60" y="460" font-size="9" fill="#888" text-anchor="middle">(reuse →)</text>
+    </g>
+
+    <!-- Arrow -->
+    <g transform="translate(105, 420)">
+      <path d="M 0 0 L 18 0 L 14 -4 M 18 0 L 14 4" stroke="#d4af37" stroke-width="2" fill="none"/>
+    </g>
+
+    <!-- Column B: composed (6'+3') -->
+    <g>
+      <rect x="125" y="20" width="80" height="480" fill="#2a2a2e" stroke="#555"/>
+      <rect x="125" y="20" width="80" height="240" fill="#d4af37"/>
+      <text x="165" y="135" font-size="11" font-weight="700" fill="#1a1a1f" text-anchor="middle">6' piece</text>
+      <text x="165" y="150" font-size="9" fill="#1a1a1f" text-anchor="middle">(cut here)</text>
+      <line x1="125" y1="260" x2="205" y2="260" stroke="#444" stroke-dasharray="2 2"/>
+      <rect x="125" y="260" width="80" height="120" fill="#d4af37"/>
+      <text x="165" y="320" font-size="11" font-weight="700" fill="#1a1a1f" text-anchor="middle">3' piece</text>
+      <text x="165" y="335" font-size="9" fill="#1a1a1f" text-anchor="middle">from col A</text>
+      <text x="165" y="395" font-size="11" font-weight="700" fill="#fff" text-anchor="middle">RIB B (9' composed)</text>
+      <!-- Bottom 3' drop from this col -->
+      <rect x="125" y="380" width="80" height="120" fill="#3a3a42" stroke="#555" stroke-dasharray="2 2"/>
+      <text x="165" y="445" font-size="11" fill="#888" text-anchor="middle">drop 3'</text>
+      <text x="165" y="460" font-size="9" fill="#888" text-anchor="middle">→ another rib</text>
+    </g>
+
+    <!-- Result label -->
+    <g transform="translate(20, 520)">
+      <rect width="185" height="64" fill="#2d4a2d" rx="4"/>
+      <text x="92" y="22" font-size="12" font-weight="700" fill="#8eff8e" text-anchor="middle">2 ribs / 1.5 columns</text>
+      <text x="92" y="40" font-size="11" fill="#bfeebf" text-anchor="middle">~20% fewer sheets</text>
+      <text x="92" y="56" font-size="10" fill="#bfeebf" text-anchor="middle">Every other rib has splice</text>
+    </g>
+  </g>
+
+  <!-- ======= 12' walls ======= -->
+  <g transform="translate(950, 150)">
+    <text x="80" y="-12" font-size="16" font-weight="700" fill="#fff" text-anchor="middle">12'  TALL</text>
+    <text x="80" y="6" font-size="11" fill="#aaa" text-anchor="middle">One rib fills column</text>
+
+    <!-- 12' tall column with single rib -->
+    <rect x="40" y="20" width="80" height="480" fill="#2a2a2e" stroke="#555"/>
+    <rect x="40" y="20" width="80" height="480" fill="#7c9bff"/>
+    <text x="80" y="255" font-size="12" font-weight="700" fill="#fff" text-anchor="middle">RIB A</text>
+    <text x="80" y="272" font-size="10" fill="#fff" text-anchor="middle">12' single</text>
+
+    <!-- Result label -->
+    <g transform="translate(0, 520)">
+      <rect width="160" height="64" fill="#2d4a2d" rx="4"/>
+      <text x="80" y="22" font-size="12" font-weight="700" fill="#8eff8e" text-anchor="middle">1 rib / column</text>
+      <text x="80" y="40" font-size="11" fill="#bfeebf" text-anchor="middle">0% waste · no splices</text>
+      <text x="80" y="56" font-size="10" fill="#bfeebf" text-anchor="middle">PERFECT FIT</text>
+    </g>
+  </g>
+
+  <!-- Bottom note -->
+  <text x="600" y="668" font-size="12" fill="#888" text-anchor="middle">
+    A 4'×12' sheet has 4 columns (at 12" max-depth ribs). At 8" depth, 6 columns. Multiply ribs/column × columns/sheet for ribs/sheet.
+  </text>
+  <text x="600" y="690" font-size="12" fill="#aaa" text-anchor="middle">
+    10' walls don't compose well (only 2' drop, too short to splice usefully) — not offered.
+  </text>
+</svg>
