@@ -20,6 +20,7 @@ import {
   COST_SHEET_BLANK,
   COST_SHEET_CNC,
   COST_HARDWARE_PER_RIB,
+  MARGIN_MULTIPLIER,
   WAVE_TYPES,
 } from './types';
 
@@ -388,13 +389,8 @@ export function calculatePricing(
   const surfaceAreaPerRibSqIn = ribLength * params.maxDepth;
   const surfaceAreaPerRibSqFt = surfaceAreaPerRibSqIn / 144;
   const totalSurfaceAreaSqFt = surfaceAreaPerRibSqFt * params.count;
-  const ribPrice = totalSurfaceAreaSqFt * PRICE_PER_SF;
 
-  const ledLinearFeet = (ribLength / 12) * params.count;
-  const ledPrice = ledLinearFeet * PRICE_LED_PER_LF;
-  const totalPrice = ribPrice + (ledEnabled ? ledPrice : 0);
-
-  // Sheet calculation (48" × 144" sheets)
+  // Sheet calculation (48" × 144" sheets) — drives both cost and price
   //   • Across the 48" width: each rib uses (maxDepth) of width → ribsPerColumn
   //   • Along the 144" height: short ribs stack (e.g. two 72" ribs per column)
   //   • Tall ribs > 144": splice into vertical sections
@@ -406,11 +402,23 @@ export function calculatePricing(
   const sheetsNeeded = Math.ceil(totalSlots / ribsPerSheet);
   const sheetTotalCost = sheetsNeeded * SHEET_PRICE;
 
-  // ── Margin / profit (internal) ─────────────────────────────────
+  // ── COST ────────────────────────────────────────────────────────
   const costMaterial = sheetsNeeded * COST_SHEET_BLANK;          // raw Corian
   const costCNC      = sheetsNeeded * COST_SHEET_CNC;            // milling
   const costHardware = params.count * COST_HARDWARE_PER_RIB;     // U-channel + brackets
   const totalCost    = costMaterial + costCNC + costHardware;
+
+  // ── RETAIL (derived from cost) ──────────────────────────────────
+  // Locked margin: retail = cost × MARGIN_MULTIPLIER (2× = 50% gross).
+  // The displayed $/sf is whatever this works out to per sf — so it
+  // varies a bit by config, but margin is constant.
+  const ribPrice = Math.round(totalCost * MARGIN_MULTIPLIER);
+  const ledLinearFeet = (ribLength / 12) * params.count;
+  const ledPrice = ledLinearFeet * PRICE_LED_PER_LF;
+  const totalPrice = ribPrice + (ledEnabled ? ledPrice : 0);
+  const pricePerSf = totalSurfaceAreaSqFt > 0 ? totalPrice / totalSurfaceAreaSqFt : 0;
+
+  // ── Margin / profit (internal) ─────────────────────────────────
   const profit       = Math.max(0, totalPrice - totalCost);
   const marginPct    = totalPrice > 0 ? (profit / totalPrice) * 100 : 0;
   const markupPct    = totalCost > 0 ? (profit / totalCost) * 100 : 0;
@@ -437,7 +445,7 @@ export function calculatePricing(
     sheetsNeeded,
     sheetTotalCost,
     wallCoverage,
-    // Margin / profit
+    // Cost / margin
     costMaterial,
     costCNC,
     costHardware,
@@ -445,6 +453,7 @@ export function calculatePricing(
     profit,
     marginPct,
     markupPct,
+    pricePerSf,
   };
 }
 

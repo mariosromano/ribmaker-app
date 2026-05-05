@@ -31,8 +31,12 @@ export type LightingPreset = 'standard' | 'dramatic' | 'sunset' | 'cool' | 'nigh
 export const WAVE_TYPES = ['Sine', 'Smooth', 'Sharp'] as const;
 
 export const SCALE = 0.1; // 1 inch = 0.1 units in 3D
-// Retail
-//   $38/sf gives ~2× margin over our landed cost (see below)
+// Retail markup
+//   retail = totalCost × MARGIN_MULTIPLIER  (2× = 50% gross margin)
+//   The customer sees a derived $/sf, not this multiplier directly.
+export const MARGIN_MULTIPLIER = 2.0;
+// Legacy — sf × this rate was the old retail formula. Kept for any
+// external reference, no longer used in calculation.
 export const PRICE_PER_SF = 38;
 export const PRICE_LED_PER_LF = 30;
 
