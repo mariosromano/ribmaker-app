@@ -471,20 +471,42 @@ export default function ControlPanel(props: ControlPanelProps) {
           label="Min Depth (from wall)"
           value={params.minDepth}
           min={2}
-          max={14}
+          max={Math.max(2, params.maxDepth - 1)}
           step={0.5}
           format={(v) => `${v}"`}
           onChange={(v) => updateParam('minDepth', v)}
         />
-        <Slider
-          label="Max Depth (from wall)"
-          value={params.maxDepth}
-          min={2}
-          max={14}
-          step={0.5}
-          format={(v) => `${v}"`}
-          onChange={(v) => updateParam('maxDepth', v)}
-        />
+
+        {/* Max Depth — snap to clean divisors of the 48" sheet width
+            (4, 6, 8, 12 → 12, 8, 6, 4 ribs per column with zero waste). */}
+        <div className="mb-3 last:mb-0">
+          <label className="flex justify-between mb-1 text-[11px] text-[#ccc]">
+            <span>Max Depth (from wall)</span>
+            <span className="text-[#7c9bff] font-medium font-mono">{params.maxDepth}"</span>
+          </label>
+          <div className="grid grid-cols-4 gap-1.5">
+            {[4, 6, 8, 12].map((d) => (
+              <button
+                key={d}
+                onClick={() => {
+                  // clamp minDepth so it never exceeds maxDepth
+                  const clampedMin = Math.min(params.minDepth, d - 0.5);
+                  onParamsChange({ ...params, maxDepth: d, minDepth: clampedMin });
+                }}
+                className={`py-2 text-[11px] rounded-md font-medium transition-colors ${
+                  params.maxDepth === d
+                    ? 'bg-[#7c9bff] text-white'
+                    : 'bg-[#4a4a52] hover:bg-[#5a5a62] text-white'
+                }`}
+              >
+                {d}"
+              </button>
+            ))}
+          </div>
+          <p className="text-[10px] text-[#666] mt-1">
+            Clean divisors of 48" sheet width — zero drop in this direction.
+          </p>
+        </div>
       </Section>
 
       {/* Wave Pattern (hidden when image loaded) */}
