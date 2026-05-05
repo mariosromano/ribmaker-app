@@ -8,6 +8,7 @@ import type {
 import { WAVE_TYPES } from '../engine/types';
 import { loadImageData, clearImageData, hasImageData, loadImageFromUrl } from '../engine/ribEngine';
 import { PATTERNS } from '../engine/patterns';
+import InfoBar from './InfoBar';
 
 interface ControlPanelProps {
   params: RibParams;
@@ -138,14 +139,13 @@ export default function ControlPanel(props: ControlPanelProps) {
     onParamsChange,
     installationMode,
     onInstallationModeChange,
+    ledEnabled,
     backdropColor,
     onBackdropColorChange,
     bgColor,
     onBgColorChange,
     floorEnabled,
     onFloorEnabledChange,
-    wallpaperEnabled,
-    onWallpaperEnabledChange,
     scaleFigureEnabled,
     onScaleFigureEnabledChange,
     imageScale,
@@ -420,19 +420,6 @@ export default function ControlPanel(props: ControlPanelProps) {
         )}
       </Section>
 
-      {/* Installation Guide */}
-      <Section title="Installation Guide" defaultOpen={true}>
-        <p className="text-[11px] text-[#aaa] mb-2 leading-relaxed">
-          Step-by-step assembly: fin into channel, L-bracket fastening, and detail views.
-        </p>
-        <button
-          onClick={() => setInstallOpen(true)}
-          className="w-full py-2.5 rounded-md bg-[#4a4a52] hover:bg-[#5a5a62] text-white text-xs font-medium transition-colors"
-        >
-          View Installation Drawings
-        </button>
-      </Section>
-
       {hasImageData() && (
         <Section title="Image Scale">
           <Slider
@@ -563,6 +550,12 @@ export default function ControlPanel(props: ControlPanelProps) {
         )}
       </Section>
 
+      {/* Pricing — sits right under Installation Mode so it updates as
+          you tweak any control above it */}
+      <div className="mb-3">
+        <InfoBar params={params} installationMode={installationMode} ledEnabled={ledEnabled} />
+      </div>
+
       {/* View */}
       <Section title="View">
         <div className="flex gap-1.5 mb-2">
@@ -586,24 +579,14 @@ export default function ControlPanel(props: ControlPanelProps) {
           />
         </div>
         <div className="mb-3">
-          <Toggle label="Wallpaper" checked={wallpaperEnabled} onChange={onWallpaperEnabledChange} />
-          {wallpaperEnabled && (
-            <div className="rounded-md overflow-hidden border border-[#555] mt-1">
-              <img src="/wallpapers/bluewallpaper.png" alt="Wallpaper" className="w-full h-14 object-cover" />
-            </div>
-          )}
+          <label className="block mb-1.5 text-xs text-[#ccc]">Wall/Ceiling Color</label>
+          <input
+            type="color"
+            className="w-full h-9 border-none rounded cursor-pointer bg-transparent"
+            value={backdropColor}
+            onChange={(e) => onBackdropColorChange(e.target.value)}
+          />
         </div>
-        {!wallpaperEnabled && (
-          <div className="mb-3">
-            <label className="block mb-1.5 text-xs text-[#ccc]">Wall/Ceiling Color</label>
-            <input
-              type="color"
-              className="w-full h-9 border-none rounded cursor-pointer bg-transparent"
-              value={backdropColor}
-              onChange={(e) => onBackdropColorChange(e.target.value)}
-            />
-          </div>
-        )}
         <div className="mb-3">
           <label className="block mb-1.5 text-xs text-[#ccc]">Background Color</label>
           <input
@@ -673,6 +656,19 @@ export default function ControlPanel(props: ControlPanelProps) {
           </div>
         </>
       )}
+
+      {/* Installation Guide — at the bottom; the last thing they need */}
+      <Section title="Installation Guide" defaultOpen={false}>
+        <p className="text-[11px] text-[#aaa] mb-2 leading-relaxed">
+          Step-by-step assembly: fin into channel, L-bracket fastening, and detail views.
+        </p>
+        <button
+          onClick={() => setInstallOpen(true)}
+          className="w-full py-2.5 rounded-md bg-[#4a4a52] hover:bg-[#5a5a62] text-white text-xs font-medium transition-colors"
+        >
+          View Installation Drawings
+        </button>
+      </Section>
 
       {/* Installation Guide Modal */}
       {installOpen && (

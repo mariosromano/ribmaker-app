@@ -9,14 +9,13 @@ import type {
 import { calculatePricing } from './engine/ribEngine';
 import Viewport3D from './components/Viewport3D';
 import ControlPanel from './components/ControlPanel';
-import InfoBar from './components/InfoBar';
 import ExportBar from './components/ExportBar';
 import ChatPanel from './components/ChatPanel';
 
 const DEFAULT_PARAMS: RibParams = {
   height: 144,
-  minDepth: 4,
-  maxDepth: 12,
+  minDepth: 3,
+  maxDepth: 8,
   thickness: 0.5,
   count: 40,
   spacing: 7,
@@ -189,11 +188,6 @@ function RightPanel(props: RightPanelProps) {
           cameraRef={cameraRef}
         />
 
-        <InfoBar
-          params={params}
-          installationMode={installationMode}
-          ledEnabled={ledEnabled}
-        />
       </div>
     </div>
   );
