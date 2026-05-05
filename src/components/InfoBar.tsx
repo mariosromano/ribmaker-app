@@ -55,13 +55,20 @@ export default function InfoBar({ params, installationMode, ledEnabled }: InfoBa
       <div className="bg-[#2d4a2d] rounded-md p-3.5 font-mono text-[14px] leading-[1.8]">
         <strong className="text-white text-[15px]">Estimated Price (Retail)</strong>
         <br />
-        <strong className="text-white">Wall:</strong>{' '}
+        <strong className="text-white">Material:</strong>{' '}
         {pricing.totalSurfaceAreaSqFt.toFixed(1)} sf · {params.count} ribs · {pricing.sheetsNeeded} sheets
+        <br />
+        <strong className="text-white">Wall face:</strong>{' '}
+        {pricing.wallSurfaceAreaSqFt.toFixed(1)} sf{' '}
+        <span className="text-[11px] text-[#bfeebf]">(width × height)</span>
         <br />
         <strong className="text-white">Per rib:</strong> {fmt(pricePerRib)}
         <br />
-        <strong className="text-white">Per sf:</strong>{' '}
-        <span className="text-[#8eff8e]">${pricing.pricePerSf.toFixed(2)}/sf</span>{' '}
+        <strong className="text-white">$/sf material:</strong>{' '}
+        <span className="text-[#8eff8e]">${pricing.pricePerSf.toFixed(2)}/sf</span>
+        <br />
+        <strong className="text-white">$/sf wall face:</strong>{' '}
+        <span className="text-[#8eff8e]">${pricing.pricePerWallSf.toFixed(2)}/sf</span>{' '}
         <span className="text-[11px] text-[#bfeebf]">(typical $35–$45/sf)</span>
         <br />
         <span className="text-[28px] font-bold text-[#8eff8e]">{fmt(pricing.totalPrice)}</span>

@@ -416,7 +416,17 @@ export function calculatePricing(
   const ledLinearFeet = (ribLength / 12) * params.count;
   const ledPrice = ledLinearFeet * PRICE_LED_PER_LF;
   const totalPrice = ribPrice + (ledEnabled ? ledPrice : 0);
+  // $/sf of rib material (bounding box per rib × rib count)
   const pricePerSf = totalSurfaceAreaSqFt > 0 ? totalPrice / totalSurfaceAreaSqFt : 0;
+
+  // ── WALL SURFACE AREA — the rectangular face the wall covers ────
+  // (first-rib center to last-rib center) × wall height.
+  // Different from rib material SF: this is what the room sees.
+  const coveredHeightIn = installationMode === 'both' ? params.height + params.ceilingRun :
+                           installationMode === 'ceiling' ? params.ceilingRun :
+                           params.height;
+  const wallSurfaceAreaSqFt = (totalWidth * coveredHeightIn) / 144;
+  const pricePerWallSf = wallSurfaceAreaSqFt > 0 ? totalPrice / wallSurfaceAreaSqFt : 0;
 
   // ── Margin / profit (internal) ─────────────────────────────────
   const profit       = Math.max(0, totalPrice - totalCost);
@@ -454,6 +464,8 @@ export function calculatePricing(
     marginPct,
     markupPct,
     pricePerSf,
+    wallSurfaceAreaSqFt,
+    pricePerWallSf,
   };
 }
 
