@@ -32,9 +32,12 @@ export const WAVE_TYPES = ['Sine', 'Smooth', 'Sharp'] as const;
 
 export const SCALE = 0.1; // 1 inch = 0.1 units in 3D
 // Retail markup
-//   retail = totalCost × MARGIN_MULTIPLIER  (2× = 50% gross margin)
+//   INTRO PRICING (valid 180 days): 1.75× = 42.86% gross margin
+//   Standard rate (after intro): 2.0× = 50% gross margin
 //   The customer sees a derived $/sf, not this multiplier directly.
-export const MARGIN_MULTIPLIER = 2.0;
+export const MARGIN_MULTIPLIER = 1.75;
+export const STANDARD_MARGIN_MULTIPLIER = 2.0; // post-intro reference
+export const INTRO_PRICING_DAYS = 180;
 // Legacy — sf × this rate was the old retail formula. Kept for any
 // external reference, no longer used in calculation.
 export const PRICE_PER_SF = 38;

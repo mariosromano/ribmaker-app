@@ -391,16 +391,46 @@ export function calculatePricing(
   const totalSurfaceAreaSqFt = surfaceAreaPerRibSqFt * params.count;
 
   // Sheet calculation (48" × 144" sheets) — drives both cost and price
+  //
   //   • Across the 48" width: each rib uses (maxDepth) of width → ribsPerColumn
-  //   • Along the 144" height: short ribs stack (e.g. two 72" ribs per column)
-  //   • Tall ribs > 144": splice into vertical sections
+  //   • Along the 144" height: short ribs stack OR get composed from drops
+  //
+  //   Composing strategy (recovers drop material via concealed splice joint):
+  //     6'  → 2 stacked per column (perfect fit, no splice)
+  //     8'  → batch of 3 ribs per 2 columns: 2 single + 1 composed (4'+4')
+  //           → 1.5 ribs per column (33% sheet savings)
+  //     9'  → batch of 8 ribs per 6 columns: 4 single + 4 composed (6'+3')
+  //           → 1.333 ribs per column (25% sheet savings)
+  //     12' → 1 per column (perfect fit, no splice)
+  //     >12'→ splice vertically into sections (no composing benefit)
+  //
   const ribsPerColumn = Math.floor(SHEET_WIDTH / params.maxDepth);
-  const ribsStackedPerColumn = Math.max(1, Math.floor(SHEET_HEIGHT / ribLength));
   const sectionsPerRib = Math.ceil(ribLength / SHEET_HEIGHT);
-  const ribsPerSheet = Math.max(1, ribsPerColumn * ribsStackedPerColumn);
+
+  // Effective ribs per column (accounts for stacking + composing)
+  let ribsPerColumnEffective: number;
+  let composedRibsCount = 0;
+  if (ribLength <= 72) {
+    ribsPerColumnEffective = Math.max(1, Math.floor(SHEET_HEIGHT / ribLength)); // 2
+  } else if (ribLength === 96) {
+    // 8' composing: 3 ribs per 2 columns, 1 of every 3 is composed
+    ribsPerColumnEffective = 1.5;
+    composedRibsCount = Math.floor(params.count / 3);
+  } else if (ribLength === 108) {
+    // 9' composing: 8 ribs per 6 columns, 4 of every 8 are composed
+    ribsPerColumnEffective = 8 / 6;
+    composedRibsCount = Math.floor(params.count / 2);
+  } else if (ribLength <= 144) {
+    ribsPerColumnEffective = 1;
+  } else {
+    ribsPerColumnEffective = 1; // tall ribs splice vertically (sectionsPerRib handles it)
+  }
+
+  const ribsPerSheet = Math.max(1, ribsPerColumn * ribsPerColumnEffective);
   const totalSlots = params.count * sectionsPerRib;
   const sheetsNeeded = Math.ceil(totalSlots / ribsPerSheet);
   const sheetTotalCost = sheetsNeeded * SHEET_PRICE;
+  const singlePieceRibs = params.count - composedRibsCount;
 
   // ── COST ────────────────────────────────────────────────────────
   const costMaterial = sheetsNeeded * COST_SHEET_BLANK;          // raw Corian
@@ -466,6 +496,8 @@ export function calculatePricing(
     pricePerSf,
     wallSurfaceAreaSqFt,
     pricePerWallSf,
+    composedRibsCount,
+    singlePieceRibs,
   };
 }
 
