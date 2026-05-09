@@ -349,7 +349,10 @@ export default function Viewport3D({
       ribGroup.add(ceil);
       ceilingMeshRef.current = ceil;
       ribGroup.rotation.set(0, 0, -Math.PI / 2);
-      ribGroup.position.set(height * SCALE / 2, actualMaxDepth * SCALE / 2, 0);
+      // Mount the ceiling assembly 10' (120") above the floor so ribs hang
+      // down from a real ceiling height, not from the ground.
+      const CEILING_HEIGHT_IN = 120;
+      ribGroup.position.set(height * SCALE / 2, CEILING_HEIGHT_IN * SCALE, 0);
     } else if (installationMode === 'both') {
       const ceilingRun = params.ceilingRun;
 
