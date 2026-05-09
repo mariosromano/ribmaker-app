@@ -349,10 +349,11 @@ export default function Viewport3D({
       ribGroup.add(ceil);
       ceilingMeshRef.current = ceil;
       ribGroup.rotation.set(0, 0, -Math.PI / 2);
-      // Mount the ceiling assembly 10' (120") above the floor so ribs hang
-      // down from a real ceiling height, not from the ground.
-      const CEILING_HEIGHT_IN = 120;
-      ribGroup.position.set(height * SCALE / 2, CEILING_HEIGHT_IN * SCALE, 0);
+      // Match Both-mode's ceiling placement: base of each rotated rib sits
+      // at (X=0, Y=12'), so ribs hang from a 12' ceiling and extend in +X
+      // over the floor — same orientation as the ceiling part of Both mode.
+      const CEILING_HEIGHT_IN = 144; // 12' commercial ceiling
+      ribGroup.position.set(0, CEILING_HEIGHT_IN * SCALE, 0);
     } else if (installationMode === 'both') {
       const ceilingRun = params.ceilingRun;
 
