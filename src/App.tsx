@@ -6,7 +6,7 @@ import type {
   InstallationMode,
   LightingPreset,
 } from './engine/types';
-import { calculatePricing } from './engine/ribEngine';
+import { calculatePricing, loadImageFromUrl } from './engine/ribEngine';
 import Viewport3D from './components/Viewport3D';
 import ControlPanel from './components/ControlPanel';
 import ExportBar from './components/ExportBar';
@@ -253,6 +253,14 @@ export default function App() {
     setHasImage(has);
     setParams((p) => ({ ...p }));
   }, []);
+
+  // Auto-load Rings pattern on first mount so the landing wall has the
+  // signature radial-wave look out of the gate.
+  useEffect(() => {
+    loadImageFromUrl('/patterns/rings.png')
+      .then(() => handleImageModeChange(true))
+      .catch(() => {});
+  }, [handleImageModeChange]);
 
   return (
     <div className="flex w-screen h-screen">
