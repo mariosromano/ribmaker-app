@@ -14,11 +14,11 @@ import ChatPanel from './components/ChatPanel';
 
 const DEFAULT_PARAMS: RibParams = {
   height: 144,
-  minDepth: 3,
-  maxDepth: 8,
+  minDepth: 2,
+  maxDepth: 6,
   thickness: 0.5,
-  count: 40,
-  spacing: 7,
+  count: 30,
+  spacing: 5,
   frequency: 2,
   phase: 0.25,
   waveType: 0,
