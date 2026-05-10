@@ -27,10 +27,14 @@ function generateDrawingCode(params: RibParams, installationMode: InstallationMo
 function drawElevationView(
   pdf: import('jspdf').jsPDF,
   params: RibParams,
+  installationMode: InstallationMode,
   x: number, y: number, w: number, h: number,
 ) {
   const totalLen = (params.count - 1) * params.spacing;
+  // params.height = vertical wall extent (wall mode) OR rib horizontal
+  // length across ceiling (ceiling mode). Same data, different orientation.
   const wallH = params.height;
+  const isCeilingOnly = installationMode === 'ceiling';
 
   // Title bar at top of box
   pdf.setFillColor(245, 245, 245);
@@ -38,7 +42,10 @@ function drawElevationView(
   pdf.setFontSize(8);
   pdf.setTextColor(60);
   pdf.setFont('helvetica', 'bold');
-  pdf.text('ELEVATION  ·  FRONT VIEW', x + w / 2, y + 0.15, { align: 'center' });
+  const titleLabel = isCeilingOnly ? 'REFLECTED CEILING PLAN' :
+                     installationMode === 'both' ? 'WALL ELEVATION  ·  FRONT VIEW' :
+                     'ELEVATION  ·  FRONT VIEW';
+  pdf.text(titleLabel, x + w / 2, y + 0.15, { align: 'center' });
 
   // Inner area for the drawing (title bar + clear room for top dim line + label)
   const padTop = 0.7;
@@ -92,6 +99,12 @@ function drawElevationView(
   pdf.setTextColor(50);
   pdf.setFont('helvetica', 'bold');
   pdf.text(fmtFt(wallH), ddX - 0.12, oy + drawH / 2, { align: 'center', angle: 90 });
+  if (isCeilingOnly) {
+    pdf.setFontSize(7);
+    pdf.setTextColor(120);
+    pdf.setFont('helvetica', 'normal');
+    pdf.text('CEILING RUN', ddX - 0.24, oy + drawH / 2, { align: 'center', angle: 90 });
+  }
 
   // Bottom dimension — first two ribs O.C. spacing
   if (params.count >= 2) {
@@ -114,14 +127,15 @@ function drawElevationView(
   pdf.text(`${params.count} RIBS @ ${params.spacing}" O.C.`, ox + drawW, oy + drawH + 0.42, { align: 'right' });
 }
 
-// ── PLAN (top view): wall line + rib rectangles with depth wave + dimensions
-function drawPlanView(
+// ── SECTION (side cut showing L-profile for Both mode)
+function drawSectionView(
   pdf: import('jspdf').jsPDF,
   params: RibParams,
   x: number, y: number, w: number, h: number,
 ) {
-  const totalLen = (params.count - 1) * params.spacing;
-  const maxDepth = params.maxDepth;
+  const wallH = params.height;            // vertical extent
+  const ceilRun = params.ceilingRun;      // horizontal extent
+  const maxDepth = params.maxDepth;       // depth from wall AND below ceiling
 
   // Title bar
   pdf.setFillColor(245, 245, 245);
@@ -129,7 +143,121 @@ function drawPlanView(
   pdf.setFontSize(8);
   pdf.setTextColor(60);
   pdf.setFont('helvetica', 'bold');
-  pdf.text('PLAN  ·  TOP VIEW', x + w / 2, y + 0.15, { align: 'center' });
+  pdf.text('SECTION  ·  L-PROFILE (typ.)', x + w / 2, y + 0.15, { align: 'center' });
+
+  const padTop = 0.7;
+  const padBottom = 0.65;
+  const padLeft = 0.7;
+  const padRight = 0.5;
+  const innerX = x + padLeft;
+  const innerY = y + padTop;
+  const innerW = w - padLeft - padRight;
+  const innerH = h - padTop - padBottom;
+
+  // The L-shape footprint: wall is on the right going up, ceiling extends left at the top
+  // Total width of the section = ceilRun + maxDepth (ceiling extent + wall thickness/depth)
+  // Total height of section = wallH + maxDepth
+  const sectW = ceilRun + maxDepth;
+  const sectH = wallH + maxDepth;
+  const sx = innerW / sectW;
+  const sy = innerH / sectH;
+  const s = Math.min(sx, sy);
+
+  const drawW = sectW * s;
+  const drawH = sectH * s;
+  const ox = innerX + (innerW - drawW) / 2;
+  const oy = innerY + (innerH - drawH) / 2;
+
+  // Wall corner is at the right side, going up the full height
+  // Ceiling extends from the wall corner to the left at the TOP
+  // Coordinates (relative to ox, oy):
+  //   wall back-line:    x = drawW - maxDepth*s    (vertical line up wallH)
+  //   ceiling top-line:  y = 0                     (horizontal line from x=0 to drawW - maxDepth*s)
+  //   wall bottom:       y = drawH                 (where wall meets floor)
+
+  const wallBackX = ox + drawW - maxDepth * s;
+  const ceilTopY = oy;
+  const wallBottomY = oy + drawH;
+
+  // Draw structural lines: wall back, ceiling top
+  pdf.setDrawColor(40);
+  pdf.setLineWidth(0.02);
+  pdf.line(wallBackX, ceilTopY, wallBackX, wallBottomY);    // wall (vertical back)
+  pdf.line(ox, ceilTopY, wallBackX, ceilTopY);              // ceiling (horizontal top)
+
+  // Draw a representative rib L-profile (wall portion + ceiling portion)
+  // Wall section depth varies; ceiling section depth varies. Use mid-depth for clarity.
+  const midDepth = (params.minDepth + params.maxDepth) / 2;
+
+  pdf.setDrawColor(80);
+  pdf.setFillColor(220, 220, 220);
+  pdf.setLineWidth(0.005);
+
+  // Wall portion: rectangle protruding from wall back, extends LEFT for midDepth
+  const wallRibW = midDepth * s;
+  pdf.rect(wallBackX - wallRibW, ceilTopY, wallRibW, drawH - maxDepth * s, 'FD');
+
+  // Ceiling portion: rectangle below ceiling, extends DOWN for midDepth, runs from corner left for ceilRun
+  const ceilRibH = midDepth * s;
+  pdf.rect(ox, ceilTopY, ceilRun * s, ceilRibH, 'FD');
+
+  // Dimension lines
+  pdf.setDrawColor(120);
+  pdf.setLineWidth(0.008);
+  pdf.setFontSize(8);
+  pdf.setTextColor(50);
+  pdf.setFont('helvetica', 'bold');
+
+  // Right side — wall height
+  const dimRX = ox + drawW + 0.18;
+  pdf.line(dimRX, ceilTopY, dimRX, wallBottomY);
+  pdf.line(dimRX - 0.05, ceilTopY, dimRX + 0.05, ceilTopY);
+  pdf.line(dimRX - 0.05, wallBottomY, dimRX + 0.05, wallBottomY);
+  pdf.text(fmtFt(wallH + maxDepth), dimRX + 0.12, (ceilTopY + wallBottomY) / 2, { align: 'center', angle: 90 });
+
+  // Top — ceiling run
+  const dimTY = ceilTopY - 0.18;
+  pdf.line(ox, dimTY, wallBackX, dimTY);
+  pdf.line(ox, dimTY - 0.05, ox, dimTY + 0.05);
+  pdf.line(wallBackX, dimTY - 0.05, wallBackX, dimTY + 0.05);
+  pdf.text(fmtFt(ceilRun), (ox + wallBackX) / 2, dimTY - 0.06, { align: 'center' });
+
+  // Callouts
+  pdf.setFontSize(7);
+  pdf.setTextColor(60);
+  pdf.setFont('helvetica', 'bold');
+  pdf.text(`MAX DEPTH ${params.maxDepth}"`, ox + drawW / 2, oy + drawH + 0.42, { align: 'center' });
+  pdf.text(`RIB SHOWN AT MID-DEPTH (${midDepth}")`, ox + drawW / 2, oy + drawH + 0.55, { align: 'center' });
+}
+
+// ── PLAN (top view) for wall/ceiling, SECTION for both
+function drawPlanView(
+  pdf: import('jspdf').jsPDF,
+  params: RibParams,
+  installationMode: InstallationMode,
+  x: number, y: number, w: number, h: number,
+) {
+  const totalLen = (params.count - 1) * params.spacing;
+  const maxDepth = params.maxDepth;
+  const isBoth = installationMode === 'both';
+
+  // For Both mode, switch to a SECTION view that shows the L-profile of
+  // a single rib (wall portion vertical, ceiling portion horizontal).
+  if (isBoth) {
+    drawSectionView(pdf, params, x, y, w, h);
+    return;
+  }
+
+  // Title bar
+  pdf.setFillColor(245, 245, 245);
+  pdf.rect(x, y, w, 0.22, 'F');
+  pdf.setFontSize(8);
+  pdf.setTextColor(60);
+  pdf.setFont('helvetica', 'bold');
+  const title = installationMode === 'ceiling'
+    ? 'PLAN  ·  CEILING SECTION'
+    : 'PLAN  ·  TOP VIEW';
+  pdf.text(title, x + w / 2, y + 0.15, { align: 'center' });
 
   const padTop = 0.7;
   const padBottom = 0.65;
@@ -227,8 +355,8 @@ export async function exportRibShopDrawingPDF(
   pdf.rect(margin, topY, halfW, topH);
   pdf.rect(margin + halfW + gap, topY, halfW, topH);
 
-  drawElevationView(pdf, params, margin, topY, halfW, topH);
-  drawPlanView(pdf, params, margin + halfW + gap, topY, halfW, topH);
+  drawElevationView(pdf, params, installationMode, margin, topY, halfW, topH);
+  drawPlanView(pdf, params, installationMode, margin + halfW + gap, topY, halfW, topH);
 
   // ─── Pricing strip (right of title block top edge) ──────────────
   const pricingX = pageW - margin - 0.1;
