@@ -18,7 +18,16 @@ if (sentryDsn) {
     sendDefaultPii: false,
     integrations: [
       Sentry.browserTracingIntegration(),
+      // Session Replay — captures user video so we can see what they
+      // were doing when something broke. Free tier: 50 replays/mo.
+      Sentry.replayIntegration({
+        maskAllText: false,  // designs/specs aren't sensitive
+        blockAllMedia: false,
+      }),
     ],
+    // Capture all sessions where an error occurred; sample 10% of all sessions
+    replaysSessionSampleRate: 0.1,
+    replaysOnErrorSampleRate: 1.0,
     // Filter common noise
     beforeSend(event, hint) {
       const err = hint?.originalException as Error | undefined
