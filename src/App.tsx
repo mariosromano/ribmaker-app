@@ -11,6 +11,7 @@ import Viewport3D from './components/Viewport3D';
 import ControlPanel from './components/ControlPanel';
 import ExportBar from './components/ExportBar';
 import ChatPanel from './components/ChatPanel';
+import Gallery from './components/Gallery';
 import { track } from './analytics';
 
 const DEFAULT_PARAMS: RibParams = {
@@ -62,6 +63,7 @@ interface RightPanelProps {
   sceneRef: React.MutableRefObject<THREE.Scene | null>;
   cameraRef: React.MutableRefObject<THREE.PerspectiveCamera | null>;
   onOpenAskMara: () => void;
+  onOpenGallery: () => void;
   panelWidth: number;
 }
 
@@ -75,7 +77,7 @@ function RightPanel(props: RightPanelProps) {
     wallpaperEnabled, onWallpaperEnabledChange, scaleFigureEnabled,
     onScaleFigureEnabledChange, imageScale, onImageScaleChange,
     onImageModeChange, ribProfiles, rendererRef, sceneRef, cameraRef,
-    onOpenAskMara, panelWidth,
+    onOpenAskMara, onOpenGallery, panelWidth,
   } = props;
 
   const pricing = useMemo(
@@ -99,13 +101,22 @@ function RightPanel(props: RightPanelProps) {
             </div>
             <div className="text-[11px] font-medium text-[#888] mt-0.5 font-mono tracking-widest uppercase">Fin Maker</div>
           </div>
-          <button
-            onClick={onOpenAskMara}
-            className="px-3.5 py-2 rounded-full text-[12px] font-semibold text-white bg-gradient-to-br from-[#d4af37] to-[#b8941f] shadow-[0_2px_10px_rgba(212,175,55,0.35)] hover:brightness-110 transition-all flex items-center gap-1.5"
-          >
-            <span className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center text-[11px] font-bold">M</span>
-            Ask Mara
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={onOpenGallery}
+              className="px-3 py-2 rounded-full text-[12px] font-semibold text-white/90 bg-white/10 hover:bg-white/15 transition-colors"
+              title="See built work"
+            >
+              Gallery
+            </button>
+            <button
+              onClick={onOpenAskMara}
+              className="px-3.5 py-2 rounded-full text-[12px] font-semibold text-white bg-gradient-to-br from-[#d4af37] to-[#b8941f] shadow-[0_2px_10px_rgba(212,175,55,0.35)] hover:brightness-110 transition-all flex items-center gap-1.5"
+            >
+              <span className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center text-[11px] font-bold">M</span>
+              Ask Mara
+            </button>
+          </div>
         </div>
 
         {/* Price card */}
@@ -212,6 +223,7 @@ export default function App() {
   const [, setHasImage] = useState(false);
 
   const [askMaraOpen, setAskMaraOpen] = useState(false);
+  const [galleryOpen, setGalleryOpen] = useState(false);
 
   // Resizable panel — drag the left-edge handle to resize 280..500px
   const [panelWidth, setPanelWidth] = useState(() => {
@@ -325,8 +337,11 @@ export default function App() {
         sceneRef={sceneRef}
         cameraRef={cameraRef}
         onOpenAskMara={() => { setAskMaraOpen(true); track('mara_opened'); }}
+        onOpenGallery={() => { setGalleryOpen(true); track('gallery_opened'); }}
         panelWidth={panelWidth}
       />
+
+      <Gallery open={galleryOpen} onClose={() => setGalleryOpen(false)} />
 
       {/* Ask Mara drawer — fixed overlay, only mounted when open */}
       {askMaraOpen && (
