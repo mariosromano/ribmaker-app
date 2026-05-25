@@ -3,6 +3,10 @@ import { createRoot } from 'react-dom/client'
 import * as Sentry from '@sentry/react'
 import './index.css'
 import App from './App.tsx'
+import { initAnalytics } from './analytics'
+
+// PostHog — analytics + session replay + funnels. No-op if no key.
+initAnalytics(import.meta.env.VITE_POSTHOG_KEY)
 
 // Sentry — only initializes if DSN is configured in Vercel env vars
 // (VITE_SENTRY_DSN). Without a DSN this is a no-op, so the app ships

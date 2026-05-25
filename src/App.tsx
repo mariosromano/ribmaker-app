@@ -11,6 +11,7 @@ import Viewport3D from './components/Viewport3D';
 import ControlPanel from './components/ControlPanel';
 import ExportBar from './components/ExportBar';
 import ChatPanel from './components/ChatPanel';
+import { track } from './analytics';
 
 const DEFAULT_PARAMS: RibParams = {
   height: 144,
@@ -323,7 +324,7 @@ export default function App() {
         rendererRef={rendererRef}
         sceneRef={sceneRef}
         cameraRef={cameraRef}
-        onOpenAskMara={() => setAskMaraOpen(true)}
+        onOpenAskMara={() => { setAskMaraOpen(true); track('mara_opened'); }}
         panelWidth={panelWidth}
       />
 

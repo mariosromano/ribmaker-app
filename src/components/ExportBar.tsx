@@ -1,6 +1,7 @@
 import { useCallback, useState } from 'react';
 import * as Sentry from '@sentry/react';
 import * as THREE from 'three';
+import { track, identify } from '../analytics';
 import type { RibParams, RibProfile, InstallationMode } from '../engine/types';
 import { exportDXF, calculatePricing } from '../engine/ribEngine';
 import { buildRibShopDrawingPDF } from '../engine/shopDrawingPDF';
@@ -114,12 +115,29 @@ export default function ExportBar({
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
 
+      // Analytics: the conversion event. Identify the user by email so all
+      // their prior anonymous slider-fiddling and renders get linked.
+      identify(email, { last_quote_code: code });
+      track('quote_generated', {
+        code,
+        total_price: pricing.totalPrice,
+        rib_count: params.count,
+        height_in: params.height,
+        max_depth_in: params.maxDepth,
+        min_depth_in: params.minDepth,
+        spacing_in: params.spacing,
+        install_mode: installationMode,
+        sheets_needed: pricing.sheetsNeeded,
+        min_order_applied: pricing.minOrderApplied,
+      });
+
       setSuccessCode(code);
     } catch (err) {
       Sentry.captureException(err, {
         tags: { feature: 'quote-pipeline' },
         extra: { email, designParams: params, installationMode },
       });
+      track('quote_failed', { error: err instanceof Error ? err.message : 'unknown' });
       setError(err instanceof Error ? err.message : 'Something went wrong.');
     } finally {
       setBusy(false);

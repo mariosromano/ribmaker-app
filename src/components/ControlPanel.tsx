@@ -1,6 +1,7 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import * as Sentry from '@sentry/react';
 import * as THREE from 'three';
+import { track } from '../analytics';
 import type {
   RibParams,
   InstallationMode,
@@ -230,6 +231,8 @@ export default function ControlPanel(props: ControlPanelProps) {
     setRendering(true);
     setRenderError(null);
     setRenderResult(null);
+    const renderStart = Date.now();
+    track('render_started', { has_scene_prompt: scenePrompt.length > 0 });
     try {
       const dataUrl = captureScreenshot();
       if (!dataUrl) throw new Error('Could not capture screenshot');
@@ -247,10 +250,15 @@ export default function ControlPanel(props: ControlPanelProps) {
       if (!res.ok) throw new Error(data.error || 'Render failed');
       if (!data.imageUrl) throw new Error('No image returned');
       setRenderResult(data.imageUrl);
+      track('render_completed', { duration_ms: Date.now() - renderStart });
     } catch (err) {
       Sentry.captureException(err, {
         tags: { feature: 'render' },
         extra: { scenePrompt },
+      });
+      track('render_failed', {
+        duration_ms: Date.now() - renderStart,
+        error: err instanceof Error ? err.message : 'unknown',
       });
       setRenderError(err instanceof Error ? err.message : 'Render failed');
     } finally {
@@ -329,6 +337,7 @@ export default function ControlPanel(props: ControlPanelProps) {
                   await loadImageFromUrl(`/patterns/${p.file}`);
                   setImagePreviewSrc(`/patterns/${p.file}`);
                   onImageModeChange(true);
+                  track('preset_selected', { preset_id: p.id, preset_name: p.name });
                 } catch {
                   alert('Failed to load pattern');
                 }
