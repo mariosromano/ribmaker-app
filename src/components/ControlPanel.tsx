@@ -320,11 +320,31 @@ export default function ControlPanel(props: ControlPanelProps) {
     [handleImageUpload]
   );
 
-  const curveControlSpacing = params.height / (params.controlPoints - 1);
-  const curveSegmentSize = params.height / params.displayResolution;
 
   return (
     <div>
+      {/* Array Settings — the two most-touched controls. Top of the panel. */}
+      <Section title="Array Settings" defaultOpen={true}>
+        <Slider
+          label="Number of Fins"
+          value={params.count}
+          min={10}
+          max={80}
+          step={1}
+          onChange={(v) => updateParam('count', v)}
+        />
+        <Slider
+          label="Spacing (center to center)"
+          value={params.spacing}
+          min={4}
+          max={24}
+          step={0.5}
+          format={(v) => `${v}"`}
+          onChange={(v) => updateParam('spacing', v)}
+          info="Min 4&quot; — U-channel hardware needs clearance. Max 24&quot; before fins read as posts."
+        />
+      </Section>
+
       {/* Browse Patterns — pick a preset or upload your own below */}
       <Section title="Browse Patterns" defaultOpen={true}>
         <div className="grid grid-cols-3 gap-1.5 max-h-[260px] overflow-y-auto pb-1">
@@ -433,41 +453,6 @@ export default function ControlPanel(props: ControlPanelProps) {
         )}
       </Section>
 
-      {hasImageData() && (
-        <Section title="Image Scale">
-          <Slider
-            label="Image Scale"
-            value={imageScale}
-            min={0.1}
-            max={5}
-            step={0.1}
-            onChange={onImageScaleChange}
-            info="Scale < 1: Image tiles/repeats"
-          />
-        </Section>
-      )}
-
-      {/* Array Settings */}
-      <Section title="Array Settings">
-        <Slider
-          label="Number of Fins"
-          value={params.count}
-          min={10}
-          max={80}
-          step={1}
-          onChange={(v) => updateParam('count', v)}
-        />
-        <Slider
-          label="Spacing (center to center)"
-          value={params.spacing}
-          min={4}
-          max={24}
-          step={0.5}
-          format={(v) => `${v}"`}
-          onChange={(v) => updateParam('spacing', v)}
-          info="Min 4&quot; — U-channel hardware needs clearance. Max 24&quot; before fins read as posts."
-        />
-      </Section>
 
       {/* Rib Dimensions */}
       <Section title="Fin Dimensions">
@@ -545,6 +530,20 @@ export default function ControlPanel(props: ControlPanelProps) {
             Clean divisors of 48" sheet width — zero drop in this direction.
           </p>
         </div>
+
+        {/* Image Scale lives here so it's right under depth controls — only
+            relevant when an image/pattern is driving the depth profile. */}
+        {hasImageData() && (
+          <Slider
+            label="Image Scale"
+            value={imageScale}
+            min={0.1}
+            max={5}
+            step={0.1}
+            onChange={onImageScaleChange}
+            info="Scale < 1: Image tiles/repeats"
+          />
+        )}
       </Section>
 
       {/* Wave Pattern (hidden when image loaded) */}
@@ -669,50 +668,15 @@ export default function ControlPanel(props: ControlPanelProps) {
 
       {showAdvanced && (
         <>
-          {/* Curve Settings */}
-          <Section title="Curve Settings" defaultOpen={false}>
-            <Slider
-              label="Control Points"
-              value={params.controlPoints}
-              min={5}
-              max={100}
-              step={1}
-              onChange={(v) => updateParam('controlPoints', v)}
-              info="Points sampled to define curve shape"
-            />
-            <Slider
-              label="Display Resolution"
-              value={params.displayResolution}
-              min={50}
-              max={500}
-              step={10}
-              onChange={(v) => updateParam('displayResolution', v)}
-              info="Segments for smooth curve rendering"
-            />
-            <div className="bg-[#1a1a1f] p-2 rounded text-[10px] text-[#666] mt-2.5">
-              Control spacing: <span className="text-[#7c9bff]">{curveControlSpacing.toFixed(2)}</span>" |
-              Segment size: <span className="text-[#7c9bff]">{curveSegmentSize.toFixed(3)}</span>"
-            </div>
-          </Section>
-
-          {/* Floor */}
-          <Section title="Floor" defaultOpen={false}>
+          {/* Floor — most common Advanced toggle */}
+          <Section title="Floor" defaultOpen={true}>
             <Toggle label="Wood Floor" checked={floorEnabled} onChange={onFloorEnabledChange} />
-          </Section>
-
-          {/* Scale Reference */}
-          <Section title="Scale Reference" defaultOpen={false}>
-            <Toggle
-              label="Person for Scale"
-              checked={scaleFigureEnabled}
-              onChange={onScaleFigureEnabledChange}
-            />
-            <p className="text-[10px] text-[#666] mt-1">5'8" figure. Drag to reposition.</p>
+            <p className="text-[10px] text-[#666] mt-1">Show/hide the wood floor under the wall.</p>
           </Section>
 
           {/* Controls info */}
           <div className="bg-[#1a1a1f] rounded-md p-2.5 mt-3 text-[10px] text-[#666] leading-relaxed">
-            <strong className="text-[#999]">Controls:</strong> Left-click drag to rotate, right-click to pan, scroll to zoom.
+            <strong className="text-[#999]">3D Controls:</strong> Left-click drag to rotate, right-click to pan, scroll to zoom.
           </div>
         </>
       )}

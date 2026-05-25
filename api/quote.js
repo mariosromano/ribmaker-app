@@ -55,6 +55,13 @@ export default async function handler(req, res) {
     dxfFilename,
     projectName,
     firm,
+    // Internal cost breakdown — never shown to user, only stored for ops
+    materialCost,
+    cncCost,
+    hardwareCost,
+    totalCost,
+    profit,
+    marginPct,
   } = req.body || {};
 
   if (!email || !code) {
@@ -83,6 +90,12 @@ export default async function handler(req, res) {
             Firm: firm || "",
             "Wall Spec": wallSpec || "",
             "Total Price": Number(totalPrice) || 0,
+            "Material Cost": Number(materialCost) || 0,
+            "CNC Cost": Number(cncCost) || 0,
+            "Hardware Cost": Number(hardwareCost) || 0,
+            "Total Cost": Number(totalCost) || 0,
+            Profit: Number(profit) || 0,
+            "Margin Pct": Number(marginPct) || 0,
             Status: "Quoted",
             "Design JSON": designJSON || "",
           },

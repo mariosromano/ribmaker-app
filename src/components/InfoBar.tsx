@@ -90,26 +90,7 @@ export default function InfoBar({ params, installationMode, ledEnabled }: InfoBa
         <span className="text-[28px] font-bold text-[#8eff8e]">{fmt(pricing.totalPrice)}</span>
       </div>
 
-      {/* Cost & Margin — internal */}
-      <div className="bg-[#3a2d4a] rounded-md p-3.5 font-mono text-[14px] leading-[1.8]">
-        <strong className="text-white text-[15px]">Cost &amp; Margin</strong>
-        <br />
-        <strong className="text-white">Material:</strong> {pricing.sheetsNeeded} sheets × $500 = {fmt(pricing.costMaterial)}
-        <br />
-        <strong className="text-white">CNC:</strong> {pricing.sheetsNeeded} sheets × $300 = {fmt(pricing.costCNC)}
-        <br />
-        <strong className="text-white">Hardware:</strong> {params.count} fins × $17 = {fmt(pricing.costHardware)}
-        <br />
-        <strong className="text-white">Total Cost:</strong>{' '}
-        <span className="text-[16px] font-bold text-[#ffb38a]">{fmt(pricing.totalCost)}</span>
-        <br />
-        <strong className="text-white">Profit:</strong>{' '}
-        <span className="text-[20px] font-bold text-[#c9a0ff]">{fmt(pricing.profit)}</span>
-        <br />
-        <strong className="text-white">Margin:</strong>{' '}
-        <span className="text-[16px] font-bold text-[#c9a0ff]">{pricing.marginPct.toFixed(1)}%</span>{' '}
-        <span className="text-[11px] text-[#aa8acc]">({pricing.markupPct.toFixed(0)}% markup)</span>
-      </div>
+      {/* Cost & Margin block hidden from user — values still flow to Airtable via /api/quote */}
     </div>
   );
 }

@@ -94,6 +94,13 @@ export default function ExportBar({
           designJSON: JSON.stringify(params),
           wallSpec,
           totalPrice: pricing.totalPrice,
+          // Internal cost breakdown — Airtable only, never shown to user
+          materialCost: pricing.costMaterial,
+          cncCost: pricing.costCNC,
+          hardwareCost: pricing.costHardware,
+          totalCost: pricing.totalCost,
+          profit: pricing.profit,
+          marginPct: Number(pricing.marginPct.toFixed(1)),
           pdfBase64,
           pdfFilename: filename,
           dxfText,

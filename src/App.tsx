@@ -95,37 +95,40 @@ function RightPanel(props: RightPanelProps) {
       style={{ width: panelWidth, minWidth: panelWidth }}
     >
       <div className="flex-1">
-        {/* Brand + Ask Mara button */}
-        <div className="flex items-center justify-between mb-3">
-          <div>
-            <div className="text-[18px] font-bold tracking-tight leading-tight text-[#d4af37]">
-              MAKE REAL
-            </div>
-            <div className="text-[11px] font-medium text-[#888] mt-0.5 font-mono tracking-widest uppercase">Fin Maker</div>
+        {/* Brand */}
+        <div className="mb-3">
+          <div className="text-[18px] font-bold tracking-tight leading-tight text-[#d4af37]">
+            MAKE REAL
           </div>
-          <div className="flex items-center gap-2">
-            <button
-              onClick={onOpenGallery}
-              className="px-3 py-2 rounded-full text-[12px] font-semibold text-white/90 bg-white/10 hover:bg-white/15 transition-colors"
-              title="See built work"
-            >
-              Gallery
-            </button>
-            <button
-              onClick={onOpenInstall}
-              className="px-3 py-2 rounded-full text-[12px] font-semibold text-white/90 bg-white/10 hover:bg-white/15 transition-colors"
-              title="Step-by-step assembly drawings"
-            >
-              Install
-            </button>
-            <button
-              onClick={onOpenAskMara}
-              className="px-3.5 py-2 rounded-full text-[12px] font-semibold text-white bg-gradient-to-br from-[#d4af37] to-[#b8941f] shadow-[0_2px_10px_rgba(212,175,55,0.35)] hover:brightness-110 transition-all flex items-center gap-1.5"
-            >
-              <span className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center text-[11px] font-bold">M</span>
-              Ask Mara
-            </button>
-          </div>
+          <div className="text-[11px] font-medium text-[#888] mt-0.5 font-mono tracking-widest uppercase">Fin Maker</div>
+        </div>
+
+        {/* Action toolbar: three peer references — see built work, learn install, talk to Mara */}
+        <div className="grid grid-cols-3 gap-2 mb-3">
+          <button
+            onClick={onOpenGallery}
+            className="flex flex-col items-center justify-center gap-1 py-2.5 rounded-lg bg-white/8 hover:bg-white/14 text-white text-[11px] font-semibold transition-colors border border-white/10"
+            title="See built work"
+          >
+            <span className="text-[16px] leading-none">▦</span>
+            Gallery
+          </button>
+          <button
+            onClick={onOpenInstall}
+            className="flex flex-col items-center justify-center gap-1 py-2.5 rounded-lg bg-white/8 hover:bg-white/14 text-white text-[11px] font-semibold transition-colors border border-white/10"
+            title="Step-by-step assembly drawings"
+          >
+            <span className="text-[16px] leading-none">⚙</span>
+            Install
+          </button>
+          <button
+            onClick={onOpenAskMara}
+            className="flex flex-col items-center justify-center gap-1 py-2.5 rounded-lg text-white text-[11px] font-bold bg-gradient-to-br from-[#d4af37] to-[#b8941f] shadow-[0_2px_10px_rgba(212,175,55,0.35)] hover:brightness-110 transition-all border border-[#d4af37]/40"
+            title="AI configurator"
+          >
+            <span className="w-5 h-5 rounded-full bg-white/25 flex items-center justify-center text-[11px] font-bold leading-none">M</span>
+            Ask Mara
+          </button>
         </div>
 
         {/* Price card */}
