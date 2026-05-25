@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
+import * as Sentry from '@sentry/react';
 import * as THREE from 'three';
 import type {
   RibParams,
@@ -247,6 +248,10 @@ export default function ControlPanel(props: ControlPanelProps) {
       if (!data.imageUrl) throw new Error('No image returned');
       setRenderResult(data.imageUrl);
     } catch (err) {
+      Sentry.captureException(err, {
+        tags: { feature: 'render' },
+        extra: { scenePrompt },
+      });
       setRenderError(err instanceof Error ? err.message : 'Render failed');
     } finally {
       setRendering(false);

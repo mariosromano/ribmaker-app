@@ -1,4 +1,5 @@
 import { useCallback, useState } from 'react';
+import * as Sentry from '@sentry/react';
 import * as THREE from 'three';
 import type { RibParams, RibProfile, InstallationMode } from '../engine/types';
 import { exportDXF, calculatePricing } from '../engine/ribEngine';
@@ -115,6 +116,10 @@ export default function ExportBar({
 
       setSuccessCode(code);
     } catch (err) {
+      Sentry.captureException(err, {
+        tags: { feature: 'quote-pipeline' },
+        extra: { email, designParams: params, installationMode },
+      });
       setError(err instanceof Error ? err.message : 'Something went wrong.');
     } finally {
       setBusy(false);
