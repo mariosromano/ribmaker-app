@@ -77,7 +77,7 @@ export default function ExportBar({
       const totalLen = (params.count - 1) * params.spacing;
       const wallSpec =
         `${fmtFt(totalLen)} wide × ${fmtFt(params.height)} tall · ` +
-        `${params.count} ribs @ ${params.spacing}" O.C. · ` +
+        `${params.count} fins @ ${params.spacing}" O.C. · ` +
         `depth ${params.minDepth}–${params.maxDepth}" · ` +
         `${pricing.sheetsNeeded} sheets · ` +
         `install: ${installationMode}`;

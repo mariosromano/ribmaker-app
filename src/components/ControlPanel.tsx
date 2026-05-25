@@ -357,7 +357,7 @@ export default function ControlPanel(props: ControlPanelProps) {
             <>
               <div className="text-2xl mb-2">📷</div>
               <p className="text-[11px] text-[#888]">Drag & drop image or click to browse</p>
-              <p className="text-[11px] text-[#888]">Brightness controls rib depth</p>
+              <p className="text-[11px] text-[#888]">Brightness controls fin depth</p>
             </>
           )}
         </div>
@@ -437,7 +437,7 @@ export default function ControlPanel(props: ControlPanelProps) {
       {/* Array Settings */}
       <Section title="Array Settings">
         <Slider
-          label="Number of Ribs"
+          label="Number of Fins"
           value={params.count}
           min={10}
           max={80}
@@ -456,13 +456,13 @@ export default function ControlPanel(props: ControlPanelProps) {
       </Section>
 
       {/* Rib Dimensions */}
-      <Section title="Rib Dimensions">
+      <Section title="Fin Dimensions">
         {/* Rib Height — snap to clean sheet-utilization heights.
             6' = 2 ribs stacked per column · 8'/9' = drop available
             for composing future ribs · 12' = full column, no drop. */}
         <div className="mb-3">
           <label className="flex justify-between mb-1 text-[11px] text-[#ccc]">
-            <span>Rib Height</span>
+            <span>Fin Height</span>
             <span className="text-[#7c9bff] font-medium font-mono">
               {Math.floor(params.height / 12)}'{params.height % 12 ? ` ${params.height % 12}"` : ''}
             </span>
@@ -616,7 +616,7 @@ export default function ControlPanel(props: ControlPanelProps) {
           ))}
         </div>
         <div className="mb-3">
-          <label className="block mb-1.5 text-xs text-[#ccc]">Rib Color</label>
+          <label className="block mb-1.5 text-xs text-[#ccc]">Fin Color</label>
           <input
             type="color"
             className="w-full h-9 border-none rounded cursor-pointer bg-transparent"
@@ -729,7 +729,7 @@ export default function ControlPanel(props: ControlPanelProps) {
             <div className="flex items-center justify-between px-6 py-4 border-b border-[#3a3a42]">
               <div>
                 <div className="text-[16px] font-bold text-white">Installation Guide</div>
-                <div className="text-[11px] text-[#888] mt-0.5">M|R Ribs · Mechanical assembly</div>
+                <div className="text-[11px] text-[#888] mt-0.5">M|R Fins · Mechanical assembly</div>
               </div>
               <button
                 onClick={() => setInstallOpen(false)}
@@ -791,8 +791,8 @@ export default function ControlPanel(props: ControlPanelProps) {
                 <div className="text-[11px] font-semibold text-[#aaa] uppercase tracking-wider mb-2">Included Hardware</div>
                 <ul className="text-[12px] text-[#ccc] space-y-1 list-disc list-inside">
                   <li>Aluminum U-channel (mounted to wall first)</li>
-                  <li>L-brackets, nuts &amp; bolts (qty per rib)</li>
-                  <li>Each rib labeled &amp; etched for placement</li>
+                  <li>L-brackets, nuts &amp; bolts (qty per fin)</li>
+                  <li>Each fin labeled &amp; etched for placement</li>
                   <li>Materials &amp; install map included with shipment</li>
                   <li>Exterior-rated assembly</li>
                 </ul>

@@ -12,7 +12,7 @@ function fmtUSD(n: number): string {
   return '$' + n.toLocaleString('en-US', { maximumFractionDigits: 0 });
 }
 
-// MRW-RIB-YYYYMMDD-XXXX — suffix is hash of params so the same design re-exports the same code
+// MRW-FIN-YYYYMMDD-XXXX — suffix is hash of params so the same design re-exports the same code
 function generateDrawingCode(params: RibParams, installationMode: InstallationMode, ledEnabled: boolean): string {
   const d = new Date();
   const ymd = `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}`;
@@ -20,7 +20,7 @@ function generateDrawingCode(params: RibParams, installationMode: InstallationMo
   let hash = 0;
   for (let i = 0; i < sig.length; i++) hash = ((hash << 5) - hash + sig.charCodeAt(i)) | 0;
   const suffix = Math.abs(hash).toString(36).toUpperCase().padStart(4, '0').slice(0, 4);
-  return `MRW-RIB-${ymd}-${suffix}`;
+  return `MRW-FIN-${ymd}-${suffix}`;
 }
 
 // ── ELEVATION (front view): wall outline + vertical rib edges + dimensions
@@ -124,7 +124,7 @@ function drawElevationView(
   pdf.setFontSize(7);
   pdf.setTextColor(60);
   pdf.setFont('helvetica', 'bold');
-  pdf.text(`${params.count} RIBS @ ${params.spacing}" O.C.`, ox + drawW, oy + drawH + 0.42, { align: 'right' });
+  pdf.text(`${params.count} FINS @ ${params.spacing}" O.C.`, ox + drawW, oy + drawH + 0.42, { align: 'right' });
 }
 
 // ── SECTION (side cut showing L-profile for Both mode)
@@ -397,7 +397,7 @@ async function _buildPdf(
   pdf.setFont('helvetica', 'bold');
   pdf.setFontSize(16);
   pdf.setTextColor(20);
-  pdf.text('M|R RIBS', margin + 0.15, tbY + 0.32);
+  pdf.text('M|R FINS', margin + 0.15, tbY + 0.32);
   pdf.setFont('helvetica', 'normal');
   pdf.setFontSize(8);
   pdf.setTextColor(80);
@@ -412,7 +412,7 @@ async function _buildPdf(
   pdf.setFontSize(7);
   pdf.setFont('helvetica', 'bold');
   pdf.setTextColor(120);
-  pdf.text('CO-RIB-01', margin + 0.15, tbY + tbH - 0.1);
+  pdf.text('CO-FIN-01', margin + 0.15, tbY + tbH - 0.1);
 
   // ── Col 2: Project Specs ────────────────────────────────────────
   const c2x = col1End + 0.12;
@@ -423,7 +423,7 @@ async function _buildPdf(
   pdf.setFontSize(11);
   pdf.setTextColor(20);
   pdf.setFont('helvetica', 'bold');
-  pdf.text('Rib Wall', c2x, tbY + 0.36);
+  pdf.text('Fin Wall', c2x, tbY + 0.36);
 
   pdf.setFont('helvetica', 'normal');
   pdf.setFontSize(8);
@@ -433,7 +433,7 @@ async function _buildPdf(
     : fmtFt(params.height);
   const specs: [string, string][] = [
     ['Wall', `${fmtFt(totalLen)} L × ${heightLabel} H`],
-    ['Rib Qty', `${params.count} ribs`],
+    ['Fin Qty', `${params.count} fins`],
     ['Spacing', `${params.spacing}" O.C.`],
     ['Depth', `${params.minDepth}"–${params.maxDepth}"  (wave)`],
     ['Thickness', `${params.thickness}"`],
@@ -464,10 +464,10 @@ async function _buildPdf(
   pdf.setFontSize(8);
   pdf.setTextColor(40);
   const scope = [
-    `Corian ribs (qty ${params.count}) — CNC machined`,
+    `Corian fins (qty ${params.count}) — CNC machined`,
     'Aluminum U-Channel hardware',
     'Attachment brackets',
-    'Each piece labeled & laser-etched (rib #)',
+    'Each piece labeled & laser-etched (fin #)',
     'Materials & installation map',
     'Exterior-rated assembly',
     'Shop drawings + DXF cut files',
@@ -501,7 +501,7 @@ async function _buildPdf(
     ['Scale', 'NTS'],
     ['Date', new Date().toLocaleDateString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit' })],
     ['Install', installLabel],
-    ['Total Ribs', `${params.count}`],
+    ['Total Fins', `${params.count}`],
     ['Total Sheets', `${pricing.sheetsNeeded}  (48"×144")`],
   ];
   let ry = tbY + 0.55;
@@ -527,7 +527,7 @@ async function _buildPdf(
   pdf.setFontSize(6.5);
   pdf.setTextColor(110);
   pdf.text(
-    'By signing, client acknowledges all dimensions, rib counts, and installation details are correct. Once signed, this document is used for fabrication; no further changes can be made.',
+    'By signing, client acknowledges all dimensions, fin counts, and installation details are correct. Once signed, this document is used for fabrication; no further changes can be made.',
     margin + 0.15,
     footerY,
     { maxWidth: pageW - 2 * margin - 0.3 },

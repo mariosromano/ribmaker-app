@@ -15,8 +15,8 @@ function getSavedKey(key: string): string {
 }
 
 const SUGGESTIONS = [
-  'Dramatic lobby wall with 60 deep ribs and red LEDs',
-  'Minimal white ceiling ribs for a modern office',
+  'Dramatic lobby wall with 60 deep fins and red LEDs',
+  'Minimal white ceiling fins for a modern office',
   'Organic flowing wall, budget $25K, warm sunset lighting',
 ];
 
@@ -80,7 +80,7 @@ export default function ChatPanel({
     {
       role: 'assistant',
       content:
-        'Describe the rib wall you want — style, size, lighting, colors, patterns — and I\'ll configure it live. Try: "dramatic lobby with 60 deep ribs and red LEDs"',
+        'Describe the fin wall you want — style, size, lighting, colors, patterns — and I\'ll configure it live. Try: "dramatic lobby with 60 deep fins and red LEDs"',
     },
   ]);
   const [loading, setLoading] = useState(false);
@@ -113,7 +113,7 @@ export default function ChatPanel({
     };
   }, [rendering]);
   const [scenePrompt, setScenePrompt] = useState(
-    'White Corian ribs, realistic architectural photography, accent lighting, keep exact rib geometry and scale'
+    'White Corian fins, realistic architectural photography, accent lighting, keep exact fin geometry and scale'
   );
   const [renderResult, setRenderResult] = useState<string | null>(null);
   const [floatingFadingOut, setFloatingFadingOut] = useState(false);
@@ -422,7 +422,7 @@ export default function ChatPanel({
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={handleKeyDown}
-                placeholder="Describe your rib wall..."
+                placeholder="Describe your fin wall..."
                 rows={3}
                 className="flex-1 px-3.5 py-3 bg-[#1a1a1f] border border-[#3a3a42] rounded-lg text-white text-[14px] resize-none outline-none font-[inherit] focus:border-[#7c9bff] transition-colors placeholder:text-[#666]"
               />
@@ -533,8 +533,8 @@ export default function ChatPanel({
           </button>
           {showAbout && (
             <div className="p-3 bg-[#1a1a1f] rounded-lg mt-1.5 text-[11px] text-[#bbb] leading-relaxed max-h-[260px] overflow-y-auto">
-              <div className="font-bold text-[#7c9bff] mb-1.5 text-xs">M|R Walls Rib Maker</div>
-              <p className="mb-2">Design custom architectural rib wall panels by describing what you want in the chat. The AI will configure the 3D preview in real time.</p>
+              <div className="font-bold text-[#7c9bff] mb-1.5 text-xs">M|R Walls Fin Maker</div>
+              <p className="mb-2">Design custom architectural fin wall panels by describing what you want in the chat. The AI will configure the 3D preview in real time.</p>
               <div className="font-semibold text-[#ccc] mb-1">What you can do:</div>
               <ul className="mb-2 pl-4 list-disc space-y-0.5">
                 <li>Describe a wall style and the AI configures everything</li>
@@ -546,9 +546,9 @@ export default function ChatPanel({
               </ul>
               <div className="font-semibold text-[#ccc] mb-1">Tips:</div>
               <ul className="pl-4 list-disc space-y-0.5">
-                <li>Be specific: "40 ribs, 12ft tall, deep waves, sunset lighting"</li>
+                <li>Be specific: "40 fins, 12ft tall, deep waves, sunset lighting"</li>
                 <li>Mention budget: "design something dramatic for under $25K"</li>
-                <li>Pricing: $45/sf ribs + $30/lf LEDs</li>
+                <li>Pricing: $45/sf fins + $30/lf LEDs</li>
               </ul>
             </div>
           )}
@@ -655,7 +655,7 @@ export default function ChatPanel({
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder="e.g. &quot;60 deep ribs with red LEDs&quot; or &quot;dramatic lobby wall under $25K&quot;"
+              placeholder="e.g. &quot;60 deep fins with red LEDs&quot; or &quot;dramatic lobby wall under $25K&quot;"
               rows={3}
               className="flex-1 px-4 py-3 bg-[#1a1a1f] border border-[#4a4a55] rounded-xl text-white text-[14px] leading-relaxed resize-none outline-none font-[inherit] focus:border-[#7c9bff] transition-colors placeholder:text-[#666]"
             />

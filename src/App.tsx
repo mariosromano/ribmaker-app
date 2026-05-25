@@ -96,7 +96,7 @@ function RightPanel(props: RightPanelProps) {
             <div className="text-[18px] font-bold tracking-tight leading-tight text-[#d4af37]">
               MAKE REAL
             </div>
-            <div className="text-[11px] font-medium text-[#888] mt-0.5 font-mono tracking-widest uppercase">Rib Maker</div>
+            <div className="text-[11px] font-medium text-[#888] mt-0.5 font-mono tracking-widest uppercase">Fin Maker</div>
           </div>
           <button
             onClick={onOpenAskMara}
@@ -117,7 +117,7 @@ function RightPanel(props: RightPanelProps) {
         <div className="bg-[#3a3a42] rounded-lg p-4 mb-3">
           <div className="grid grid-cols-3 gap-2 text-center text-[11px]">
             <div>
-              <div className="text-[#888] mb-0.5">Ribs</div>
+              <div className="text-[#888] mb-0.5">Fins</div>
               <div className="text-white font-bold text-sm">{params.count}</div>
             </div>
             <div>

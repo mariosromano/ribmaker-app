@@ -27,7 +27,7 @@ export default function InfoBar({ params, installationMode, ledEnabled }: InfoBa
 
       {/* Dimensions */}
       <div className="font-mono text-[13px] text-[#bbb] p-3 bg-[#1a1a1f] rounded leading-[1.8]">
-        <strong className="text-white">Number of Ribs:</strong> {params.count}<br />
+        <strong className="text-white">Number of Fins:</strong> {params.count}<br />
         <strong className="text-white">Min Depth:</strong> {params.minDepth}"{' '}
         | <strong className="text-white">Max Depth:</strong> {params.maxDepth}"<br />
         <strong className="text-white">Total Array Width:</strong>{' '}
@@ -42,10 +42,10 @@ export default function InfoBar({ params, installationMode, ledEnabled }: InfoBa
         <strong className="text-white">Material Sheets</strong>{' '}
         <span className="text-[11px] text-[#888]">(48" × 144" Corian)</span>
         <br />
-        <strong>Ribs/sheet:</strong> {pricing.ribsPerSheet} |{' '}
+        <strong>Fins/sheet:</strong> {pricing.ribsPerSheet} |{' '}
         <strong>Sheets needed:</strong>{' '}
         {pricing.sheetsNeeded}
-        {pricing.sectionsPerRib > 1 && ` (spliced, ${pricing.sectionsPerRib} sections/rib)`}
+        {pricing.sectionsPerRib > 1 && ` (spliced, ${pricing.sectionsPerRib} sections/fin)`}
         <br />
         <strong>Sheet price:</strong> {fmt(pricePerSheet)}/sheet{' '}
         <span className="text-[11px] text-[#888]">(total ÷ {pricing.sheetsNeeded})</span>
@@ -60,7 +60,7 @@ export default function InfoBar({ params, installationMode, ledEnabled }: InfoBa
           </span>
         </div>
         <strong className="text-white">Material:</strong>{' '}
-        {pricing.totalSurfaceAreaSqFt.toFixed(1)} sf · {params.count} ribs · {pricing.sheetsNeeded} sheets
+        {pricing.totalSurfaceAreaSqFt.toFixed(1)} sf · {params.count} fins · {pricing.sheetsNeeded} sheets
         <br />
         <strong className="text-white">Wall face:</strong>{' '}
         {pricing.wallSurfaceAreaSqFt.toFixed(1)} sf{' '}
@@ -74,7 +74,7 @@ export default function InfoBar({ params, installationMode, ledEnabled }: InfoBa
             <br />
           </>
         )}
-        <strong className="text-white">Per rib:</strong> {fmt(pricePerRib)}
+        <strong className="text-white">Per fin:</strong> {fmt(pricePerRib)}
         <br />
         <strong className="text-white">$/sf material:</strong>{' '}
         <span className="text-[#8eff8e]">${pricing.pricePerSf.toFixed(2)}/sf</span>
@@ -93,7 +93,7 @@ export default function InfoBar({ params, installationMode, ledEnabled }: InfoBa
         <br />
         <strong className="text-white">CNC:</strong> {pricing.sheetsNeeded} sheets × $300 = {fmt(pricing.costCNC)}
         <br />
-        <strong className="text-white">Hardware:</strong> {params.count} ribs × $17 = {fmt(pricing.costHardware)}
+        <strong className="text-white">Hardware:</strong> {params.count} fins × $17 = {fmt(pricing.costHardware)}
         <br />
         <strong className="text-white">Total Cost:</strong>{' '}
         <span className="text-[16px] font-bold text-[#ffb38a]">{fmt(pricing.totalCost)}</span>
