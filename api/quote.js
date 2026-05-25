@@ -13,6 +13,8 @@
 //   { ok: true, code, recordId }  on success
 //   { ok: false, error }          on failure
 
+import { checkRateLimit, rateLimitResponse } from "./_rateLimit.js";
+
 const AIRTABLE_BASE_ID = "appmXXG57Mx4ykzqV";
 const AIRTABLE_TABLE_ID = "tblnIFI3Ls4dNdaQA";
 
@@ -28,6 +30,11 @@ export default async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({ ok: false, error: "Method not allowed" });
   }
+
+  // Rate limit: quote generation is cheap per call but each one writes an
+  // Airtable row + uploads PDF + DXF. Cap per-IP to 10/hour to prevent spam.
+  const rl = await checkRateLimit(req, "quote", { limit: 10, windowSec: 3600 });
+  if (!rl.allowed) return rateLimitResponse(res, rl);
 
   const token = process.env.AIRTABLE_TOKEN;
   if (!token) {

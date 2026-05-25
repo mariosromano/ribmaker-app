@@ -1,4 +1,5 @@
 import Anthropic from "@anthropic-ai/sdk";
+import { checkRateLimit, rateLimitResponse } from "./_rateLimit.js";
 
 const PATTERNS = [
   { id: "rings", name: "Rings", file: "rings.png" },
@@ -93,6 +94,11 @@ export default async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
   }
+
+  // Rate limit: Anthropic Haiku is cheap but unbounded chat could still rack
+  // up cost. Cap per-IP to 30/hour — generous for real users, blocks scripts.
+  const rl = await checkRateLimit(req, "chat", { limit: 30, windowSec: 3600 });
+  if (!rl.allowed) return rateLimitResponse(res, rl);
 
   // Key priority: env var > header (env var means owner pre-configured it on Vercel)
   const apiKey = process.env.ANTHROPIC_API_KEY || req.headers["x-api-key"];

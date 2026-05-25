@@ -1,7 +1,13 @@
+import { checkRateLimit, rateLimitResponse } from "./_rateLimit.js";
+
 export default async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
   }
+
+  // Rate limit: FAL renders are ~$0.10 each. Cap per-IP to 5/hour.
+  const rl = await checkRateLimit(req, "render", { limit: 5, windowSec: 3600 });
+  if (!rl.allowed) return rateLimitResponse(res, rl);
 
   // Key priority: env var > header
   const falKey = process.env.FAL_API_KEY || req.headers["x-fal-key"];
