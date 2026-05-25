@@ -5,10 +5,14 @@
   "functions": {
     "api/render.js": {
       "maxDuration": 60
+    },
+    "api/quote.js": {
+      "maxDuration": 30
     }
   },
   "rewrites": [
     { "source": "/api/chat", "destination": "/api/chat" },
-    { "source": "/api/render", "destination": "/api/render" }
+    { "source": "/api/render", "destination": "/api/render" },
+    { "source": "/api/quote", "destination": "/api/quote" }
   ]
 }

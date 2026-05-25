@@ -324,7 +324,16 @@ function drawPlanView(
   pdf.text(`DEPTH: ${params.minDepth}" MIN · ${params.maxDepth}" MAX  (wave)`, ox + drawW / 2, oy + drawH + 0.42, { align: 'center' });
 }
 
-export async function exportRibShopDrawingPDF(
+// Public helper — returns the drawing code without building the PDF.
+export function getRibDrawingCode(
+  params: RibParams,
+  installationMode: InstallationMode,
+  ledEnabled: boolean,
+): string {
+  return generateDrawingCode(params, installationMode, ledEnabled);
+}
+
+async function _buildPdf(
   params: RibParams,
   installationMode: InstallationMode,
   ledEnabled: boolean,
@@ -533,5 +542,30 @@ export async function exportRibShopDrawingPDF(
     { maxWidth: pageW - 2 * margin - 0.3 },
   );
 
+  return { pdf, drawingCode };
+}
+
+// Build the PDF and return base64 + blob + code (no download triggered).
+// Used by the quote pipeline so the API can store it in Airtable and the
+// client can trigger its own download from the blob.
+export async function buildRibShopDrawingPDF(
+  params: RibParams,
+  installationMode: InstallationMode,
+  ledEnabled: boolean,
+): Promise<{ code: string; pdfBase64: string; pdfBlob: Blob; filename: string }> {
+  const { pdf, drawingCode } = await _buildPdf(params, installationMode, ledEnabled);
+  const dataUri = pdf.output('datauristring') as string;
+  const pdfBase64 = dataUri.replace(/^data:application\/pdf;[^,]*,/, '');
+  const pdfBlob = pdf.output('blob') as Blob;
+  return { code: drawingCode, pdfBase64, pdfBlob, filename: `${drawingCode}.pdf` };
+}
+
+// Build + immediately save (original behaviour — kept for any caller still using it).
+export async function exportRibShopDrawingPDF(
+  params: RibParams,
+  installationMode: InstallationMode,
+  ledEnabled: boolean,
+) {
+  const { pdf, drawingCode } = await _buildPdf(params, installationMode, ledEnabled);
   pdf.save(`${drawingCode}.pdf`);
 }
