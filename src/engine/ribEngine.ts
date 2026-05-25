@@ -21,6 +21,7 @@ import {
   COST_SHEET_CNC,
   COST_HARDWARE_PER_RIB,
   MARGIN_MULTIPLIER,
+  MIN_ORDER_USD,
   WAVE_TYPES,
 } from './types';
 
@@ -439,13 +440,21 @@ export function calculatePricing(
   const totalCost    = costMaterial + costCNC + costHardware;
 
   // ── RETAIL (derived from cost) ──────────────────────────────────
-  // Locked margin: retail = cost × MARGIN_MULTIPLIER (2× = 50% gross).
+  // Locked margin: retail = cost × MARGIN_MULTIPLIER (1.75× = 43% gross).
   // The displayed $/sf is whatever this works out to per sf — so it
   // varies a bit by config, but margin is constant.
-  const ribPrice = Math.round(totalCost * MARGIN_MULTIPLIER);
+  const ribPriceRaw = Math.round(totalCost * MARGIN_MULTIPLIER);
   const ledLinearFeet = (ribLength / 12) * params.count;
   const ledPrice = ledLinearFeet * PRICE_LED_PER_LF;
-  const totalPrice = ribPrice + (ledEnabled ? ledPrice : 0);
+  const totalPriceRaw = ribPriceRaw + (ledEnabled ? ledPrice : 0);
+
+  // Floor: tiny projects can't cover fixed costs. Anything below
+  // MIN_ORDER_USD gets bumped up. minOrderApplied = true so the UI can
+  // surface "Project minimum applied" to be transparent about it.
+  const minOrderApplied = totalPriceRaw < MIN_ORDER_USD;
+  const totalPrice = minOrderApplied ? MIN_ORDER_USD : totalPriceRaw;
+  const ribPrice = minOrderApplied ? MIN_ORDER_USD - (ledEnabled ? ledPrice : 0) : ribPriceRaw;
+
   // $/sf of rib material (bounding box per rib × rib count)
   const pricePerSf = totalSurfaceAreaSqFt > 0 ? totalPrice / totalSurfaceAreaSqFt : 0;
 
@@ -498,6 +507,8 @@ export function calculatePricing(
     pricePerWallSf,
     composedRibsCount,
     singlePieceRibs,
+    minOrderApplied,
+    totalPriceRaw,
   };
 }
 

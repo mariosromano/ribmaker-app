@@ -52,3 +52,9 @@ export const SHEET_PRICE = 1800;      // $ per sheet (retail anchor — not used
 export const COST_SHEET_BLANK = 500;  // $ per Corian sheet (material)
 export const COST_SHEET_CNC = 300;    // $ per sheet for CNC milling
 export const COST_HARDWARE_PER_RIB = 17; // U-channel + L-brackets + bolts per rib
+
+// Floor — tiny projects can't cover fixed costs (engineering, shop
+// drawings, crating, freight, install crew mobilization). Anything that
+// would price below this gets bumped up. Trade-off: low-end customers
+// see a slightly higher % markup; we don't lose money on small jobs.
+export const MIN_ORDER_USD = 3500;

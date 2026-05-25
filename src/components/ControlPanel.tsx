@@ -447,11 +447,12 @@ export default function ControlPanel(props: ControlPanelProps) {
         <Slider
           label="Spacing (center to center)"
           value={params.spacing}
-          min={1}
-          max={50}
+          min={4}
+          max={24}
           step={0.5}
           format={(v) => `${v}"`}
           onChange={(v) => updateParam('spacing', v)}
+          info="Min 4&quot; — U-channel hardware needs clearance. Max 24&quot; before fins read as posts."
         />
       </Section>
 

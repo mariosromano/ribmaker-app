@@ -74,6 +74,11 @@ export default function InfoBar({ params, installationMode, ledEnabled }: InfoBa
             <br />
           </>
         )}
+        {pricing.minOrderApplied && (
+          <div className="my-1 px-2 py-1 rounded bg-[#3a2d2d] text-[#ffb38a] text-[11px]">
+            ⓘ Project minimum applied — small projects priced at $3,500 floor.
+          </div>
+        )}
         <strong className="text-white">Per fin:</strong> {fmt(pricePerRib)}
         <br />
         <strong className="text-white">$/sf material:</strong>{' '}
