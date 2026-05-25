@@ -24,6 +24,9 @@ if (sentryDsn) {
         maskAllText: false,  // designs/specs aren't sensitive
         blockAllMedia: false,
       }),
+      // Capture console.error calls too — catches things devs log
+      // but never throw (e.g. fetch failures handled with toast).
+      Sentry.captureConsoleIntegration({ levels: ['error'] }),
     ],
     // Capture all sessions where an error occurred; sample 10% of all sessions
     replaysSessionSampleRate: 0.1,
