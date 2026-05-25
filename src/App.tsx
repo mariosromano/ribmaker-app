@@ -212,6 +212,23 @@ function RightPanel(props: RightPanelProps) {
           cameraRef={cameraRef}
         />
 
+        {/* Studio CTA — for projects that exceed the configurator's range */}
+        <div className="mt-4 p-4 rounded-lg bg-gradient-to-br from-[#2a2a30] to-[#1f1f24] border border-[#3a3a42]">
+          <div className="text-[12px] font-semibold text-white mb-1.5">
+            Need something the configurator can't quite do?
+          </div>
+          <p className="text-[11px] text-[#aaa] leading-relaxed mb-3">
+            Our studio handles custom shapes, oversized installs, and full design collaboration.
+          </p>
+          <a
+            href="mailto:orders@marioromano.com?subject=Custom%20Fin%20Project%20Inquiry&body=Hi%20M%7CR%20Studio%2C%0A%0AI%27m%20working%20on%20a%20project%20that%20goes%20beyond%20the%20standard%20configurator.%20Here%27s%20what%20I%27m%20trying%20to%20achieve%3A%0A%0A%5BDescribe%20your%20project%5D%0A%0AThanks%2C"
+            onClick={() => track('studio_contact_clicked')}
+            className="block w-full py-2.5 rounded-md text-center text-[12px] font-semibold text-white bg-[#4a4a52] hover:bg-[#5a5a62] transition-colors"
+          >
+            Talk to M|R Studio →
+          </a>
+        </div>
+
       </div>
     </div>
   );
