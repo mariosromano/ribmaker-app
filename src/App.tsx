@@ -12,6 +12,7 @@ import ControlPanel from './components/ControlPanel';
 import ExportBar from './components/ExportBar';
 import ChatPanel from './components/ChatPanel';
 import Gallery from './components/Gallery';
+import InstallationGuide from './components/InstallationGuide';
 import { track } from './analytics';
 
 const DEFAULT_PARAMS: RibParams = {
@@ -64,6 +65,7 @@ interface RightPanelProps {
   cameraRef: React.MutableRefObject<THREE.PerspectiveCamera | null>;
   onOpenAskMara: () => void;
   onOpenGallery: () => void;
+  onOpenInstall: () => void;
   panelWidth: number;
 }
 
@@ -77,7 +79,7 @@ function RightPanel(props: RightPanelProps) {
     wallpaperEnabled, onWallpaperEnabledChange, scaleFigureEnabled,
     onScaleFigureEnabledChange, imageScale, onImageScaleChange,
     onImageModeChange, ribProfiles, rendererRef, sceneRef, cameraRef,
-    onOpenAskMara, onOpenGallery, panelWidth,
+    onOpenAskMara, onOpenGallery, onOpenInstall, panelWidth,
   } = props;
 
   const pricing = useMemo(
@@ -108,6 +110,13 @@ function RightPanel(props: RightPanelProps) {
               title="See built work"
             >
               Gallery
+            </button>
+            <button
+              onClick={onOpenInstall}
+              className="px-3 py-2 rounded-full text-[12px] font-semibold text-white/90 bg-white/10 hover:bg-white/15 transition-colors"
+              title="Step-by-step assembly drawings"
+            >
+              Install
             </button>
             <button
               onClick={onOpenAskMara}
@@ -224,6 +233,7 @@ export default function App() {
 
   const [askMaraOpen, setAskMaraOpen] = useState(false);
   const [galleryOpen, setGalleryOpen] = useState(false);
+  const [installOpen, setInstallOpen] = useState(false);
 
   // Resizable panel — drag the left-edge handle to resize 280..500px
   const [panelWidth, setPanelWidth] = useState(() => {
@@ -338,10 +348,12 @@ export default function App() {
         cameraRef={cameraRef}
         onOpenAskMara={() => { setAskMaraOpen(true); track('mara_opened'); }}
         onOpenGallery={() => { setGalleryOpen(true); track('gallery_opened'); }}
+        onOpenInstall={() => { setInstallOpen(true); track('install_guide_opened'); }}
         panelWidth={panelWidth}
       />
 
       <Gallery open={galleryOpen} onClose={() => setGalleryOpen(false)} />
+      <InstallationGuide open={installOpen} onClose={() => setInstallOpen(false)} />
 
       {/* Ask Mara drawer — fixed overlay, only mounted when open */}
       {askMaraOpen && (
