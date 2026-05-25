@@ -203,12 +203,9 @@ export default function ExportBar({
               </>
             ) : (
               <>
-                <div className="text-[18px] font-bold text-white mb-1">Quote saved ✓</div>
-                <div className="text-[12px] text-[#aaa] mb-4">
-                  Your shop drawing is downloading. Reference this code when you&apos;re ready to fabricate:
-                </div>
-                <div className="bg-[#1a1a1f] border border-[#3a3a42] rounded-md p-3 mb-5 font-mono text-[14px] text-[#7c9bff] text-center select-all">
-                  {successCode}
+                <div className="text-[20px] font-bold text-white mb-2">Thank you ✓</div>
+                <div className="text-[13px] text-[#ccc] mb-5 leading-relaxed">
+                  Your shop drawing and quote are in your downloads folder.
                 </div>
                 <button
                   onClick={closeModal}
