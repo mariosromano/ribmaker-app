@@ -47,6 +47,12 @@ export const PRICE_LED_PER_LF = 30;
 export const SHEET_WIDTH = 48;        // inches
 export const SHEET_HEIGHT = 144;      // inches (= 48 sf per sheet)
 export const SHEET_PRICE = 1800;      // $ per sheet (retail anchor — not used in margin calc)
+// CNC kerf + handling clearance between nested fins on the sheet. Conservative
+// pricing: fins are laid out in straight parallel lanes with this gap between
+// each. We do NOT assume profile-interlock nesting (which a real DXF audit
+// showed needs a complement-pairing solver to be reliable) — any nesting the
+// shop achieves becomes bonus margin rather than a discount baked into quotes.
+export const FIN_SHEET_GAP_IN = 1;    // inches
 
 // COST inputs — used for margin / profit display
 export const COST_SHEET_BLANK = 500;  // $ per Corian sheet (material)

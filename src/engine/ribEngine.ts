@@ -16,6 +16,7 @@ import {
   PRICE_LED_PER_LF,
   SHEET_WIDTH,
   SHEET_HEIGHT,
+  FIN_SHEET_GAP_IN,
   SHEET_PRICE,
   COST_SHEET_BLANK,
   COST_SHEET_CNC,
@@ -405,7 +406,13 @@ export function calculatePricing(
   //     12' → 1 per column (perfect fit, no splice)
   //     >12'→ splice vertically into sections (no composing benefit)
   //
-  const ribsPerColumn = Math.floor(SHEET_WIDTH / params.maxDepth);
+  // Straight-lane packing across the 48" width WITH a 1" CNC clearance between
+  // fins. N lanes have (N-1) gaps, so the closed form adds one phantom gap:
+  //   floor((width + gap) / (laneWidth + gap))   where laneWidth = maxDepth.
+  // Conservative: no profile-interlock assumed (see FIN_SHEET_GAP_IN note).
+  const ribsPerColumn = Math.floor(
+    (SHEET_WIDTH + FIN_SHEET_GAP_IN) / (params.maxDepth + FIN_SHEET_GAP_IN)
+  );
   const sectionsPerRib = Math.ceil(ribLength / SHEET_HEIGHT);
 
   // Effective ribs per column (accounts for stacking + composing)

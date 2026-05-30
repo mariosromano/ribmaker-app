@@ -229,6 +229,20 @@ function RightPanel(props: RightPanelProps) {
           </a>
         </div>
 
+        {/* Footer — legal */}
+        <div className="mt-3 text-[10px] text-[#666] text-center">
+          <a
+            href="https://mrwalls.io/privacy-policy"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:underline"
+          >
+            Privacy Policy
+          </a>
+          <span className="mx-1.5">·</span>
+          <span>© M|R Walls</span>
+        </div>
+
       </div>
     </div>
   );
