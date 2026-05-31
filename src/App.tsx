@@ -396,7 +396,7 @@ export default function App() {
             className="fixed inset-0 bg-black/40 z-40"
             onClick={() => setAskMaraOpen(false)}
           />
-          <div className="fixed top-0 right-0 h-screen z-50" style={{ width: 380 }}>
+          <div className="fixed top-0 right-0 h-screen z-50" style={{ width: 420 }}>
             <ChatPanel
               params={params}
               onParamsChange={setParams}
