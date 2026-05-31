@@ -15,9 +15,9 @@ function getSavedKey(key: string): string {
 }
 
 const SUGGESTIONS = [
-  'Dramatic lobby wall with 60 deep fins and red LEDs',
+  'Dramatic lobby wall with 60 deep flowing fins',
   'Minimal white ceiling fins for a modern office',
-  'Organic flowing wall, budget $25K, warm sunset lighting',
+  'Organic flowing feature wall with warm sunset lighting',
 ];
 
 interface ChatPanelProps {
@@ -61,9 +61,6 @@ export default function ChatPanel({
   onImageModeChange,
   onScaleFigureEnabledChange,
   onFloorEnabledChange,
-  rendererRef,
-  sceneRef,
-  cameraRef,
   isFloating = false,
   sidebarReady = true,
   onOnboardingComplete,
@@ -72,49 +69,18 @@ export default function ChatPanel({
   onClose,
 }: ChatPanelProps) {
   const [apiKey, setApiKey] = useState(() => getSavedKey('ribmaker_api_key'));
-  const [falKey, setFalKey] = useState(() => getSavedKey('ribmaker_fal_key'));
   const [serverHasAnthropicKey, setServerHasAnthropicKey] = useState(false);
-  const [serverHasFalKey, setServerHasFalKey] = useState(false);
   const [input, setInput] = useState('');
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       role: 'assistant',
       content:
-        'Describe the fin wall you want — style, size, lighting, colors, patterns — and I\'ll configure it live. Try: "dramatic lobby with 60 deep fins and red LEDs"',
+        'Describe the fin wall you want — style, size, depth, colors, patterns — and I\'ll configure it live. Try: "dramatic lobby with 60 deep flowing fins" or "minimal white ceiling fins for a modern office."',
     },
   ]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showAbout, setShowAbout] = useState(false);
-  const [showRenderPanel, setShowRenderPanel] = useState(false);
-  const [rendering, setRendering] = useState(false);
-  const [renderProgress, setRenderProgress] = useState(0);
-  const [renderElapsed, setRenderElapsed] = useState(0);
-  const renderStartRef = useRef<number | null>(null);
-  const renderTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
-
-  useEffect(() => {
-    if (rendering) {
-      renderStartRef.current = Date.now();
-      setRenderProgress(0);
-      setRenderElapsed(0);
-      renderTimerRef.current = setInterval(() => {
-        if (!renderStartRef.current) return;
-        const elapsed = (Date.now() - renderStartRef.current) / 1000;
-        setRenderElapsed(elapsed);
-        setRenderProgress(92 * (1 - Math.exp(-elapsed / 8)));
-      }, 100);
-    } else {
-      if (renderTimerRef.current) clearInterval(renderTimerRef.current);
-      renderTimerRef.current = null;
-    }
-    return () => {
-      if (renderTimerRef.current) clearInterval(renderTimerRef.current);
-    };
-  }, [rendering]);
-  const [scenePrompt, setScenePrompt] = useState(
-    'White Corian fins, realistic architectural photography, accent lighting, keep exact fin geometry and scale'
-  );
   const [renderResult, setRenderResult] = useState<string | null>(null);
   const [floatingFadingOut, setFloatingFadingOut] = useState(false);
 
@@ -127,7 +93,6 @@ export default function ChatPanel({
       .then((r) => r.json())
       .then((cfg) => {
         if (cfg.hasAnthropicKey) setServerHasAnthropicKey(true);
-        if (cfg.hasFalKey) setServerHasFalKey(true);
       })
       .catch(() => {});
   }, []);
@@ -151,11 +116,6 @@ export default function ChatPanel({
   const handleKeyChange = useCallback((val: string) => {
     setApiKey(val);
     localStorage.setItem('ribmaker_api_key', val);
-  }, []);
-
-  const handleFalKeyChange = useCallback((val: string) => {
-    setFalKey(val);
-    localStorage.setItem('ribmaker_fal_key', val);
   }, []);
 
   // Auto-scroll chat
@@ -216,82 +176,6 @@ export default function ChatPanel({
     },
     [onImageModeChange]
   );
-
-  // Capture screenshot from Three.js renderer (downscaled JPEG to stay under Vercel 4.5MB limit)
-  const captureScreenshot = useCallback((): string | null => {
-    const renderer = rendererRef.current;
-    const scene = sceneRef.current;
-    const camera = cameraRef.current;
-    if (!renderer || !scene || !camera) return null;
-
-    renderer.render(scene, camera);
-
-    // Downscale to max 1536px on longest side and use JPEG for smaller payload
-    const canvas = renderer.domElement;
-    const maxDim = 1536;
-    let w = canvas.width;
-    let h = canvas.height;
-    if (w > maxDim || h > maxDim) {
-      const ratio = maxDim / Math.max(w, h);
-      w = Math.round(w * ratio);
-      h = Math.round(h * ratio);
-    }
-    const offscreen = document.createElement('canvas');
-    offscreen.width = w;
-    offscreen.height = h;
-    const ctx = offscreen.getContext('2d');
-    if (!ctx) return canvas.toDataURL('image/jpeg', 0.85);
-    ctx.drawImage(canvas, 0, 0, w, h);
-    return offscreen.toDataURL('image/jpeg', 0.85);
-  }, [rendererRef, sceneRef, cameraRef]);
-
-  // FAL render
-  const handleRender = useCallback(async () => {
-    if (!falKey && !serverHasFalKey) {
-      setError('Enter your FAL API key first.');
-      return;
-    }
-
-    setRendering(true);
-    setError(null);
-    setRenderResult(null);
-
-    try {
-      const dataUrl = captureScreenshot();
-      if (!dataUrl) throw new Error('Could not capture screenshot');
-
-      const base64 = dataUrl.replace(/^data:image\/[a-z]+;base64,/, '');
-
-      const renderHeaders: Record<string, string> = { 'Content-Type': 'application/json' };
-      if (falKey) renderHeaders['x-fal-key'] = falKey;
-
-      const res = await fetch('/api/render', {
-        method: 'POST',
-        headers: renderHeaders,
-        body: JSON.stringify({ image: base64, prompt: scenePrompt }),
-      });
-
-      const text = await res.text();
-      let data: any;
-      try {
-        data = JSON.parse(text);
-      } catch {
-        throw new Error(`Server error (${res.status}): ${text.slice(0, 120)}`);
-      }
-      if (!res.ok) throw new Error(data.error || 'Render failed');
-
-      setRenderResult(data.imageUrl);
-      setMessages((prev) => [
-        ...prev,
-        { role: 'user', content: 'Render realistic' },
-        { role: 'assistant', content: "Here's the photorealistic render:", imageUrl: data.imageUrl },
-      ]);
-    } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Render failed');
-    } finally {
-      setRendering(false);
-    }
-  }, [falKey, serverHasFalKey, scenePrompt, captureScreenshot]);
 
   // Send chat message
   const sendMessage = useCallback(async () => {
@@ -380,9 +264,9 @@ export default function ChatPanel({
                 M<span className="text-[#7c9bff]">|</span>R Walls
               </div>
               <div className="text-[#999] text-sm leading-relaxed">
-                Describe the rib wall you want and the AI will configure it live.
+                Describe the fin wall you want and Mara will configure it live.
                 <br />
-                Style, size, lighting, patterns, budget — just tell it what you need.
+                Style, size, depth, patterns, budget — just tell her what you need.
               </div>
             </div>
 
@@ -442,7 +326,7 @@ export default function ChatPanel({
             {/* Loading state */}
             {loading && (
               <div className="text-center text-[#7c9bff] text-[13px] mt-4">
-                Configuring your rib wall...
+                Configuring your fin wall...
               </div>
             )}
 
@@ -510,15 +394,6 @@ export default function ChatPanel({
               className="w-full px-2.5 py-1.5 bg-[#1a1a1f] border border-[#3a3a42] rounded text-[#ccc] text-[11px] mb-1.5 outline-none"
             />
           )}
-          {!serverHasFalKey && (
-            <input
-              type="password"
-              placeholder="FAL API Key (for realistic renders)"
-              value={falKey}
-              onChange={(e) => handleFalKeyChange(e.target.value)}
-              className="w-full px-2.5 py-1.5 bg-[#1a1a1f] border border-[#3a3a42] rounded text-[#ccc] text-[11px] outline-none"
-            />
-          )}
         </div>
 
         {/* How to Use */}
@@ -537,18 +412,16 @@ export default function ChatPanel({
               <p className="mb-2">Design custom architectural fin wall panels by describing what you want in the chat. The AI will configure the 3D preview in real time.</p>
               <div className="font-semibold text-[#ccc] mb-1">What you can do:</div>
               <ul className="mb-2 pl-4 list-disc space-y-0.5">
-                <li>Describe a wall style and the AI configures everything</li>
-                <li>Set a budget and the AI reverse-engineers parameters</li>
+                <li>Describe a wall style and Mara configures everything</li>
+                <li>Mention a budget and Mara dials in the scale to suit</li>
                 <li>Choose from 15+ pattern images (Browse Patterns)</li>
                 <li>Switch between Wall, Ceiling, or Both modes</li>
-                <li>Toggle LED strip lighting with custom colors</li>
-                <li>Render photorealistic images (requires FAL API key)</li>
               </ul>
               <div className="font-semibold text-[#ccc] mb-1">Tips:</div>
               <ul className="pl-4 list-disc space-y-0.5">
                 <li>Be specific: "40 fins, 12ft tall, deep waves, sunset lighting"</li>
-                <li>Mention budget: "design something dramatic for under $25K"</li>
-                <li>Pricing: $45/sf fins + $30/lf LEDs</li>
+                <li>Mention budget and watch the live price on the right panel</li>
+                <li>Use Render Realistic on the main panel for a photoreal view</li>
               </ul>
             </div>
           )}
@@ -585,11 +458,6 @@ export default function ChatPanel({
               Configuring...
             </div>
           )}
-          {rendering && (
-            <div className="px-3.5 py-2.5 rounded-[14px_14px_14px_4px] bg-[#3a3a42] text-[#c9a0ff] text-[13px] inline-block">
-              Rendering photorealistic image...
-            </div>
-          )}
           {error && (
             <div className="px-3 py-2 rounded-lg bg-[#4a2a2a] text-[#ff6b6b] text-xs">
               {error}
@@ -598,64 +466,15 @@ export default function ChatPanel({
           <div ref={chatEndRef} />
         </div>
 
-        {/* Render Panel */}
-        <div className="px-6 pt-1.5">
-          <button
-            onClick={() => setShowRenderPanel(!showRenderPanel)}
-            className={`w-full py-2 border rounded-md text-[11px] cursor-pointer font-semibold transition-colors ${
-              showRenderPanel
-                ? 'bg-[#5a3a7a] border-[#7a5aaa] text-white'
-                : 'bg-transparent border-[#7a5aaa] text-[#c9a0ff]'
-            }`}
-          >
-            {showRenderPanel ? 'Hide Render' : 'Render Realistic'}
-          </button>
-          {showRenderPanel && (
-            <div className="py-2">
-              <textarea
-                value={scenePrompt}
-                onChange={(e) => setScenePrompt(e.target.value)}
-                rows={3}
-                placeholder="Describe the scene context..."
-                className="w-full px-2.5 py-2 bg-[#1a1a1f] border border-[#3a3a42] rounded-md text-white text-[11px] resize-none outline-none font-[inherit] mb-1.5"
-              />
-              <button
-                onClick={handleRender}
-                disabled={rendering || (!falKey && !serverHasFalKey)}
-                className={`w-full py-2.5 border-none rounded-md text-[13px] font-bold text-white ${
-                  rendering || (!falKey && !serverHasFalKey)
-                    ? 'bg-[#555] cursor-default'
-                    : 'bg-gradient-to-br from-[#7a5aaa] to-[#5a3a8a] cursor-pointer'
-                }`}
-              >
-                {rendering ? `Rendering… ${renderElapsed.toFixed(1)}s` : (!falKey && !serverHasFalKey) ? 'Enter FAL Key Above' : 'Render'}
-              </button>
-              {rendering && (
-                <div className="mt-2">
-                  <div className="h-1.5 w-full bg-[#1a1a1f] rounded-full overflow-hidden">
-                    <div
-                      className="h-full bg-gradient-to-r from-[#7a5aaa] to-[#a87adf] transition-all"
-                      style={{ width: `${renderProgress}%` }}
-                    />
-                  </div>
-                  <div className="text-[10px] text-[#888] mt-1 text-center">
-                    Photorealistic render usually takes ~15s
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-
         {/* Input — primary interaction */}
         <div className="p-4 px-6 border-t border-[#4a4a55] bg-[#2e2e36]">
-          <div className="text-[10px] text-[#888] mb-2 uppercase tracking-wider font-medium">Describe your wall</div>
+          <div className="text-[10px] text-[#888] mb-2 uppercase tracking-wider font-medium">Chat with Mara — describe your wall</div>
           <div className="flex gap-2">
             <textarea
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder="e.g. &quot;60 deep fins with red LEDs&quot; or &quot;dramatic lobby wall under $25K&quot;"
+              placeholder="e.g. &quot;60 deep flowing fins&quot; or &quot;dramatic lobby wall under $25K&quot;"
               rows={3}
               className="flex-1 px-4 py-3 bg-[#1a1a1f] border border-[#4a4a55] rounded-xl text-white text-[14px] leading-relaxed resize-none outline-none font-[inherit] focus:border-[#7c9bff] transition-colors placeholder:text-[#666]"
             />

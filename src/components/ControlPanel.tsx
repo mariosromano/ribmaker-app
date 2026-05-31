@@ -148,8 +148,6 @@ export default function ControlPanel(props: ControlPanelProps) {
     onBgColorChange,
     floorEnabled,
     onFloorEnabledChange,
-    scaleFigureEnabled,
-    onScaleFigureEnabledChange,
     imageScale,
     onImageScaleChange,
     onImageModeChange,
