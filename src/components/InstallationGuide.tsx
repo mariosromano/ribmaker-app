@@ -11,17 +11,17 @@ export default function InstallationGuide({ open, onClose }: InstallationGuidePr
       onClick={onClose}
     >
       <div
-        className="relative bg-[#1a1a1f] rounded-xl shadow-[0_20px_60px_rgba(0,0,0,0.6)] w-[92vw] max-w-[900px] h-[90vh] flex flex-col"
+        className="relative bg-[var(--surface-1)] rounded-xl shadow-[0_20px_60px_rgba(0,0,0,0.6)] w-[92vw] max-w-[900px] h-[90vh] flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between px-6 py-4 border-b border-[#3a3a42]">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--line)]">
           <div>
             <div className="text-[16px] font-bold text-white">Installation Guide</div>
             <div className="text-[11px] text-[#888] mt-0.5">M|R Fins · Mechanical assembly</div>
           </div>
           <button
             onClick={onClose}
-            className="w-9 h-9 rounded-md text-white bg-[#3a3a42] hover:bg-[#5a5a62] border border-[#5a5a62] flex items-center justify-center text-2xl leading-none font-bold"
+            className="w-9 h-9 rounded-md text-white bg-[var(--surface-3)] hover:bg-[var(--surface-4)] border border-[var(--line-strong)] flex items-center justify-center text-2xl leading-none font-bold"
             aria-label="Close"
           >
             ×
@@ -29,7 +29,7 @@ export default function InstallationGuide({ open, onClose }: InstallationGuidePr
         </div>
         <div className="flex-1 overflow-y-auto px-6 py-5">
           <div className="mb-8">
-            <div className="text-[#7c9bff] font-bold text-[13px] mb-1">STEP 1.1</div>
+            <div className="text-[var(--gold)] font-bold text-[13px] mb-1">STEP 1.1</div>
             <div className="text-white font-semibold mb-2">Fin into channel</div>
             <p className="text-[#ccc] text-[12px] leading-relaxed mb-3">
               Align the channel with the "L"-shaped engraving on the fin and firmly press the fin
@@ -40,13 +40,13 @@ export default function InstallationGuide({ open, onClose }: InstallationGuidePr
             <img
               src="/installation/step-1.png"
               alt="Step 1.1 — fin into channel"
-              className="w-full rounded border border-[#3a3a42] bg-white"
+              className="w-full rounded border border-[var(--line)] bg-white"
               onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
             />
           </div>
 
           <div className="mb-8">
-            <div className="text-[#7c9bff] font-bold text-[13px] mb-1">STEP 1.2</div>
+            <div className="text-[var(--gold)] font-bold text-[13px] mb-1">STEP 1.2</div>
             <div className="text-white font-semibold mb-2">L-bracket fastening</div>
             <p className="text-[#ccc] text-[12px] leading-relaxed mb-3">
               Align the slot on the shorter flange of the L-bracket with the hole on the channel
@@ -56,13 +56,13 @@ export default function InstallationGuide({ open, onClose }: InstallationGuidePr
             <img
               src="/installation/step-2.png"
               alt="Step 1.2 — L-bracket fastening"
-              className="w-full rounded border border-[#3a3a42] bg-white"
+              className="w-full rounded border border-[var(--line)] bg-white"
               onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
             />
           </div>
 
           <div className="mb-4">
-            <div className="text-[#7c9bff] font-bold text-[13px] mb-1">DETAIL A</div>
+            <div className="text-[var(--gold)] font-bold text-[13px] mb-1">DETAIL A</div>
             <div className="text-white font-semibold mb-2">Bracket close-up</div>
             <p className="text-[#ccc] text-[12px] leading-relaxed mb-3">
               Detail view of the L-bracket secured through the channel slot.
@@ -70,12 +70,12 @@ export default function InstallationGuide({ open, onClose }: InstallationGuidePr
             <img
               src="/installation/step-2-detail.png"
               alt="Detail A — bracket close-up"
-              className="w-full rounded border border-[#3a3a42] bg-white"
+              className="w-full rounded border border-[var(--line)] bg-white"
               onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
             />
           </div>
 
-          <div className="mt-6 p-4 rounded-md bg-[#2a2a30] border border-[#3a3a42]">
+          <div className="mt-6 p-4 rounded-md bg-[var(--surface-2)] border border-[var(--line)]">
             <div className="text-[11px] font-semibold text-[#aaa] uppercase tracking-wider mb-2">Included Hardware</div>
             <ul className="text-[12px] text-[#ccc] space-y-1 list-disc list-inside">
               <li>Aluminum U-channel (mounted to wall first)</li>

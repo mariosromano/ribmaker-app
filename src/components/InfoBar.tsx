@@ -8,6 +8,18 @@ interface InfoBarProps {
   ledEnabled: boolean;
 }
 
+/** A clean label → value row used across the summary cards. */
+function Row({ label, value, muted = false }: { label: string; value: string; muted?: boolean }) {
+  return (
+    <div className="flex items-baseline justify-between gap-3">
+      <span className="text-[12px] text-[var(--ink-muted)] shrink-0">{label}</span>
+      <span className={`text-[12.5px] font-medium text-right ${muted ? 'text-[var(--ink-soft)]' : 'text-[var(--ink)]'}`}>
+        {value}
+      </span>
+    </div>
+  );
+}
+
 export default function InfoBar({ params, installationMode, ledEnabled }: InfoBarProps) {
   const pricing = useMemo(
     () => calculatePricing(params, installationMode, ledEnabled),
@@ -17,77 +29,74 @@ export default function InfoBar({ params, installationMode, ledEnabled }: InfoBa
   const fmt = (n: number) =>
     '$' + n.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
 
-  const pricePerSheet = pricing.sheetsNeeded > 0 ? pricing.totalPrice / pricing.sheetsNeeded : 0;
   const pricePerRib = params.count > 0 ? pricing.totalPrice / params.count : 0;
 
   return (
-    <div className="space-y-1.5">
-      {/* Internal verification — not for public release */}
-      <div className="text-[9px] text-[#666] uppercase tracking-wider px-1">Internal · for verification</div>
-
-      {/* Dimensions */}
-      <div className="font-mono text-[13px] text-[#bbb] p-3 bg-[#1a1a1f] rounded leading-[1.8]">
-        <strong className="text-white">Number of Fins:</strong> {params.count}<br />
-        <strong className="text-white">Min Depth:</strong> {params.minDepth}"{' '}
-        | <strong className="text-white">Max Depth:</strong> {params.maxDepth}"<br />
-        <strong className="text-white">Total Array Width:</strong>{' '}
-        {pricing.totalWidth.toFixed(1)}" ({(pricing.totalWidth / 12).toFixed(1)}')
-        <br />
-        <strong className="text-white">Wall Coverage:</strong> {pricing.wallCoverage}<br />
-        <strong className="text-white">Surface Area:</strong> {pricing.totalSurfaceAreaSqFt.toFixed(1)} sf
+    <div className="space-y-2.5">
+      {/* ── Project Summary ─────────────────────────────────────── */}
+      <div className="rounded-xl border border-[var(--line)] bg-[var(--surface-2)] overflow-hidden">
+        <div className="px-4 pt-3 pb-2 border-b border-[var(--line)]">
+          <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[var(--ink-muted)]">
+            Project Summary
+          </span>
+        </div>
+        <div className="px-4 py-3 space-y-2">
+          <Row label="Fins" value={`${params.count}`} />
+          <Row label="Depth" value={`${params.minDepth}"–${params.maxDepth}"`} />
+          <Row label="Array width" value={`${(pricing.totalWidth / 12).toFixed(1)}′  (${pricing.totalWidth.toFixed(0)}")`} />
+          <Row label="Wall coverage" value={pricing.wallCoverage} />
+          <Row label="Surface area" value={`${pricing.totalSurfaceAreaSqFt.toFixed(1)} sf`} />
+        </div>
       </div>
 
-      {/* Material Sheets */}
-      <div className="font-mono text-[13px] text-[#bbb] p-3 bg-[#1a1a1f] rounded leading-[1.8]">
-        <strong className="text-white">Material Sheets</strong>{' '}
-        <span className="text-[11px] text-[#888]">(48" × 144" Corian)</span>
-        <br />
-        <strong>Fins/sheet:</strong> {pricing.ribsPerSheet} |{' '}
-        <strong>Sheets needed:</strong>{' '}
-        {pricing.sheetsNeeded}
-        {pricing.sectionsPerRib > 1 && ` (spliced, ${pricing.sectionsPerRib} sections/fin)`}
-        <br />
-        <strong>Sheet price:</strong> {fmt(pricePerSheet)}/sheet{' '}
-        <span className="text-[11px] text-[#888]">(total ÷ {pricing.sheetsNeeded})</span>
+      {/* ── Material Estimate ───────────────────────────────────── */}
+      <div className="rounded-xl border border-[var(--line)] bg-[var(--surface-2)] overflow-hidden">
+        <div className="px-4 pt-3 pb-2 border-b border-[var(--line)] flex items-center justify-between">
+          <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[var(--ink-muted)]">
+            Material Estimate
+          </span>
+          <span className="text-[9px] text-[var(--ink-faint)]">48″ × 144″ Corian</span>
+        </div>
+        <div className="px-4 py-3 space-y-2">
+          <Row label="Fins per sheet" value={`${pricing.ribsPerSheet}`} />
+          <Row
+            label="Sheets needed"
+            value={`${pricing.sheetsNeeded}${pricing.sectionsPerRib > 1 ? ` · ${pricing.sectionsPerRib} sections/fin` : ''}`}
+          />
+          {pricing.composedRibsCount > 0 && (
+            <Row
+              label="Build"
+              value={`${pricing.singlePieceRibs} single + ${pricing.composedRibsCount} composed`}
+            />
+          )}
+        </div>
       </div>
 
-      {/* Pricing — retail */}
-      <div className="bg-[#2d4a2d] rounded-md p-3.5 font-mono text-[14px] leading-[1.8]">
-        <div className="flex items-center justify-between mb-1">
-          <strong className="text-white text-[15px]">Project Investment</strong>
-          <span className="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded bg-[#d4af37] text-[#1a1a1f]">
+      {/* ── Investment ──────────────────────────────────────────── */}
+      <div className="rounded-xl border border-[var(--gold-deep)]/30 bg-gradient-to-b from-[var(--surface-3)] to-[var(--surface-2)] overflow-hidden">
+        <div className="px-4 pt-3 pb-2 flex items-center justify-between">
+          <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--gold-bright)]">
+            Project Investment
+          </span>
+          <span className="text-[9px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-[var(--gold)] text-[#1a1a14]">
             Intro · 180 days
           </span>
         </div>
-        <strong className="text-white">Material:</strong>{' '}
-        {pricing.totalSurfaceAreaSqFt.toFixed(1)} sf · {params.count} fins · {pricing.sheetsNeeded} sheets
-        <br />
-        <strong className="text-white">Wall face:</strong>{' '}
-        {pricing.wallSurfaceAreaSqFt.toFixed(1)} sf{' '}
-        <span className="text-[11px] text-[#bfeebf]">(width × height)</span>
-        <br />
-        {pricing.composedRibsCount > 0 && (
-          <>
-            <strong className="text-white">Build:</strong>{' '}
-            {pricing.singlePieceRibs} single + {pricing.composedRibsCount} composed{' '}
-            <span className="text-[11px] text-[#bfeebf]">(concealed splice)</span>
-            <br />
-          </>
-        )}
-        {pricing.minOrderApplied && (
-          <div className="my-1 px-2 py-1 rounded bg-[#3a2d2d] text-[#ffb38a] text-[11px]">
-            ⓘ Project minimum applied — small projects priced at $3,500 floor.
+        <div className="px-4 pb-3">
+          <div className="text-[34px] font-semibold tracking-tight text-[var(--ink)] leading-none mb-2.5 font-mono">
+            {fmt(pricing.totalPrice)}
           </div>
-        )}
-        <strong className="text-white">Per fin:</strong> {fmt(pricePerRib)}
-        <br />
-        <strong className="text-white">$/sf material:</strong>{' '}
-        <span className="text-[#8eff8e]">${pricing.pricePerSf.toFixed(2)}/sf</span>
-        <br />
-        <strong className="text-white">$/sf wall face:</strong>{' '}
-        <span className="text-[#8eff8e]">${pricing.pricePerWallSf.toFixed(2)}/sf</span>
-        <br />
-        <span className="text-[28px] font-bold text-[#8eff8e]">{fmt(pricing.totalPrice)}</span>
+          <div className="space-y-1.5 pt-2.5 border-t border-[var(--line)]">
+            <Row label="Per fin" value={fmt(pricePerRib)} muted />
+            <Row label="Wall face" value={`${pricing.wallSurfaceAreaSqFt.toFixed(1)} sf`} muted />
+            <Row label="$ / sf wall face" value={`$${pricing.pricePerWallSf.toFixed(2)}`} muted />
+          </div>
+          {pricing.minOrderApplied && (
+            <div className="mt-2.5 px-3 py-2 rounded-lg bg-[var(--surface-4)] border border-[var(--line)] text-[var(--gold-bright)] text-[11px] leading-relaxed">
+              Project minimum applied — small projects are priced at the $3,500 floor.
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Cost & Margin block hidden from user — values still flow to Airtable via /api/quote */}

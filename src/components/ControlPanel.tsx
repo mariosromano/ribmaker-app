@@ -56,15 +56,20 @@ function Section({
 }) {
   const [open, setOpen] = useState(defaultOpen);
   return (
-    <div className="bg-[#3a3a42] rounded-lg mb-3">
+    <div className="rounded-xl border border-[var(--line)] bg-[var(--surface-2)] mb-2.5 overflow-hidden">
       <button
-        className="w-full flex items-center justify-between px-4 py-2.5 text-left"
+        className="w-full flex items-center justify-between px-4 py-3 text-left group"
         onClick={() => setOpen(!open)}
       >
-        <span className="text-[11px] font-semibold text-[#aaa] uppercase tracking-wider">{title}</span>
-        <span className="text-[#666] text-[10px]">{open ? '▲' : '▼'}</span>
+        <span className="text-[10.5px] font-semibold text-[var(--ink-muted)] uppercase tracking-[0.14em] group-hover:text-[var(--ink-soft)] transition-colors">{title}</span>
+        <svg
+          className={`text-[var(--ink-faint)] transition-transform duration-200 ${open ? 'rotate-180' : ''}`}
+          width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
+        >
+          <polyline points="6 9 12 15 18 9" />
+        </svg>
       </button>
-      {open && <div className="px-4 pb-3.5 pt-0.5">{children}</div>}
+      {open && <div className="px-4 pb-4 pt-0.5">{children}</div>}
     </div>
   );
 }
@@ -89,10 +94,10 @@ function Slider({
   info?: string;
 }) {
   return (
-    <div className="mb-2.5 last:mb-0">
-      <label className="flex justify-between mb-1 text-[11px] text-[#ccc]">
+    <div className="mb-3.5 last:mb-0">
+      <label className="flex justify-between mb-1.5 text-[12px] text-[var(--ink-soft)]">
         <span className="truncate mr-2">{label}</span>
-        <span className="text-[#7c9bff] font-medium font-mono shrink-0">
+        <span className="text-[var(--gold-bright)] font-semibold font-mono shrink-0 tabular-nums">
           {format ? format(value) : value}
         </span>
       </label>
@@ -104,7 +109,7 @@ function Slider({
         value={value}
         onChange={(e) => onChange(parseFloat(e.target.value))}
       />
-      {info && <p className="text-[10px] text-[#666] mt-0.5">{info}</p>}
+      {info && <p className="text-[10.5px] text-[var(--ink-faint)] mt-1.5 leading-relaxed">{info}</p>}
     </div>
   );
 }
@@ -119,8 +124,8 @@ function Toggle({
   onChange: (checked: boolean) => void;
 }) {
   return (
-    <div className="flex items-center justify-between mb-3">
-      <label className="text-xs text-[#ccc]">{label}</label>
+    <div className="flex items-center justify-between mb-3 last:mb-0">
+      <label className="text-[12px] text-[var(--ink-soft)]">{label}</label>
       <label className="relative w-11 h-6 cursor-pointer">
         <input
           type="checkbox"
@@ -128,8 +133,8 @@ function Toggle({
           checked={checked}
           onChange={(e) => onChange(e.target.checked)}
         />
-        <div className="w-11 h-6 bg-[#555] rounded-full peer-checked:bg-[#7c9bff] transition-colors" />
-        <div className="absolute left-[3px] bottom-[3px] w-[18px] h-[18px] bg-white rounded-full transition-transform peer-checked:translate-x-5" />
+        <div className="w-11 h-6 bg-[var(--surface-4)] rounded-full peer-checked:bg-[var(--gold)] transition-colors" />
+        <div className="absolute left-[3px] bottom-[3px] w-[18px] h-[18px] bg-white rounded-full transition-transform peer-checked:translate-x-5 shadow-sm" />
       </label>
     </div>
   );
@@ -359,7 +364,7 @@ export default function ControlPanel(props: ControlPanelProps) {
                   alert('Failed to load pattern');
                 }
               }}
-              className="p-1 bg-[#1a1a1f] border border-[#3a3a42] rounded cursor-pointer text-center hover:border-[#7c9bff] transition-colors"
+              className="p-1.5 bg-[var(--surface-1)] border border-[var(--line)] rounded-lg cursor-pointer text-center hover:border-[var(--gold)] transition-colors"
             >
               <img
                 src={`/patterns/${p.file}`}
@@ -376,7 +381,7 @@ export default function ControlPanel(props: ControlPanelProps) {
       <Section title="Profile Image (Optional)">
         <div
           className="border-2 border-dashed border-[#555] rounded-lg p-4 text-center cursor-pointer
-                     hover:border-[#7c9bff] hover:bg-[rgba(124,155,255,0.1)] transition-all min-h-[80px]
+                     hover:border-[var(--gold)] hover:bg-[rgba(201,169,106,0.08)] transition-all min-h-[80px]
                      flex flex-col items-center justify-center"
           onClick={() => document.getElementById('image-file-input')?.click()}
           onDragOver={(e) => e.preventDefault()}
@@ -403,7 +408,7 @@ export default function ControlPanel(props: ControlPanelProps) {
         />
         {imagePreviewSrc && (
           <button
-            className="w-full mt-1.5 py-2.5 rounded-md bg-[#4a4a52] hover:bg-[#5a5a62] text-white text-xs font-medium transition-colors"
+            className="w-full mt-1.5 py-2.5 rounded-md bg-[var(--surface-3)] hover:bg-[var(--surface-4)] text-[var(--ink-soft)] text-xs font-medium transition-colors"
             onClick={handleClearImage}
           >
             Clear Image
@@ -460,7 +465,7 @@ export default function ControlPanel(props: ControlPanelProps) {
         <div className="mb-3">
           <label className="flex justify-between mb-1 text-[11px] text-[#ccc]">
             <span>Fin Height</span>
-            <span className="text-[#7c9bff] font-medium font-mono">
+            <span className="text-[var(--gold-bright)] font-semibold font-mono">
               {Math.floor(params.height / 12)}'{params.height % 12 ? ` ${params.height % 12}"` : ''}
             </span>
           </label>
@@ -476,8 +481,8 @@ export default function ControlPanel(props: ControlPanelProps) {
                 onClick={() => updateParam('height', h.in)}
                 className={`py-2 text-[11px] rounded-md font-medium transition-colors ${
                   params.height === h.in
-                    ? 'bg-[#7c9bff] text-white'
-                    : 'bg-[#4a4a52] hover:bg-[#5a5a62] text-white'
+                    ? 'bg-[var(--gold)] text-[#1a1a14] font-semibold'
+                    : 'bg-[var(--surface-3)] hover:bg-[var(--surface-4)] text-[var(--ink-soft)]'
                 }`}
               >
                 {h.label}
@@ -503,7 +508,7 @@ export default function ControlPanel(props: ControlPanelProps) {
         <div className="mb-3 last:mb-0">
           <label className="flex justify-between mb-1 text-[11px] text-[#ccc]">
             <span>Max Depth (from wall)</span>
-            <span className="text-[#7c9bff] font-medium font-mono">{params.maxDepth}"</span>
+            <span className="text-[var(--gold-bright)] font-semibold font-mono">{params.maxDepth}"</span>
           </label>
           <div className="grid grid-cols-4 gap-1.5">
             {[4, 6, 8, 12].map((d) => (
@@ -516,8 +521,8 @@ export default function ControlPanel(props: ControlPanelProps) {
                 }}
                 className={`py-2 text-[11px] rounded-md font-medium transition-colors ${
                   params.maxDepth === d
-                    ? 'bg-[#7c9bff] text-white'
-                    : 'bg-[#4a4a52] hover:bg-[#5a5a62] text-white'
+                    ? 'bg-[var(--gold)] text-[#1a1a14] font-semibold'
+                    : 'bg-[var(--surface-3)] hover:bg-[var(--surface-4)] text-[var(--ink-soft)]'
                 }`}
               >
                 {d}"
@@ -583,8 +588,8 @@ export default function ControlPanel(props: ControlPanelProps) {
               key={mode}
               className={`flex-1 py-2 px-3 text-[11px] rounded transition-all ${
                 installationMode === mode
-                  ? 'bg-[#7c9bff] text-white'
-                  : 'bg-transparent text-[#888] hover:bg-[#3a3a42] hover:text-[#ccc]'
+                  ? 'bg-[var(--gold)] text-[#1a1a14] font-semibold'
+                  : 'bg-transparent text-[var(--ink-muted)] hover:bg-[var(--surface-3)] hover:text-[var(--ink-soft)]'
               }`}
               onClick={() => onInstallationModeChange(mode)}
             >
@@ -619,7 +624,7 @@ export default function ControlPanel(props: ControlPanelProps) {
           {['front', 'top', 'side', 'perspective'].map((view) => (
             <button
               key={view}
-              className="flex-1 py-2 text-[11px] rounded-md bg-[#4a4a52] hover:bg-[#5a5a62] text-white font-medium transition-colors"
+              className="flex-1 py-2 text-[11px] rounded-md bg-[var(--surface-3)] hover:bg-[var(--surface-4)] text-[var(--ink-soft)] font-medium transition-colors"
               onClick={() => (window as any).__ribmakerSetView?.(view)}
             >
               {view === 'perspective' ? '3D' : view.charAt(0).toUpperCase() + view.slice(1)}

@@ -7,6 +7,32 @@ interface ChatMessage {
   role: 'user' | 'assistant';
   content: string;
   imageUrl?: string;
+  applied?: string[]; // concierge confirmation — human-readable settings Mara changed
+}
+
+// Turn Mara's raw param JSON into client-facing "what changed" chips.
+function summarizeApplied(p: Record<string, unknown>): string[] {
+  const out: string[] = [];
+  const lighting: Record<string, string> = {
+    standard: 'Standard lighting', dramatic: 'Dramatic lighting',
+    sunset: 'Sunset lighting', cool: 'Cool lighting', night: 'Night lighting',
+  };
+  const waveTypes = ['Sine wave', 'Smooth wave', 'Sharp wave'];
+  if (p.count !== undefined) out.push(`${p.count} fins`);
+  if (p.spacing !== undefined) out.push(`${p.spacing}″ spacing`);
+  if (p.height !== undefined) out.push(`${Math.floor(Number(p.height) / 12)}′ tall`);
+  if (p.maxDepth !== undefined) out.push(`${p.maxDepth}″ max depth`);
+  if (p.installationMode !== undefined) {
+    const m = String(p.installationMode);
+    out.push(m === 'both' ? 'Wall + ceiling' : m.charAt(0).toUpperCase() + m.slice(1) + ' mount');
+  }
+  if (p.waveType !== undefined && waveTypes[Number(p.waveType)]) out.push(waveTypes[Number(p.waveType)]);
+  if (p.frequency !== undefined) out.push(`Wave freq ${p.frequency}`);
+  if (p.lighting !== undefined && lighting[String(p.lighting)]) out.push(lighting[String(p.lighting)]);
+  if (p.ledEnabled === true) out.push('LED lighting on');
+  if (p.color !== undefined) out.push('Fin color');
+  if (p.patternImage !== undefined && p.patternImage !== null) out.push('Pattern applied');
+  return out;
 }
 
 function getSavedKey(key: string): string {
@@ -206,7 +232,14 @@ export default function ChatPanel({
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Request failed');
 
-      const assistantMsg: ChatMessage = { role: 'assistant', content: data.text };
+      // Build the concierge "what I changed" summary from the params + pattern
+      const summarySource = { ...(data.params || {}) };
+      if (data.patternImageUrl) summarySource.patternImage = data.patternImageUrl;
+      const applied = (data.params && Object.keys(data.params).length > 0) || data.patternImageUrl
+        ? summarizeApplied(summarySource)
+        : [];
+
+      const assistantMsg: ChatMessage = { role: 'assistant', content: data.text, applied };
       setMessages((prev) => [...prev, assistantMsg]);
 
       if (data.params && Object.keys(data.params).length > 0) {
@@ -257,11 +290,11 @@ export default function ChatPanel({
               : 'floatCardIn 0.4s ease-out',
           }}
         >
-          <div className="w-[520px] max-w-[90vw] bg-[#2a2a30] rounded-2xl border border-[#3a3a42] p-8 shadow-[0_24px_80px_rgba(0,0,0,0.6)]">
+          <div className="w-[520px] max-w-[90vw] bg-[var(--surface-1)] rounded-2xl border border-[var(--line)] p-8 shadow-[0_24px_80px_rgba(0,0,0,0.6)]">
             {/* Branding */}
             <div className="text-center mb-6">
               <div className="text-[28px] font-bold text-white mb-2">
-                M<span className="text-[#7c9bff]">|</span>R Walls
+                M<span className="text-[var(--gold)]">|</span>R Walls
               </div>
               <div className="text-[#999] text-sm leading-relaxed">
                 Describe the fin wall you want and Mara will configure it live.
@@ -277,7 +310,7 @@ export default function ChatPanel({
                 placeholder="Anthropic API Key (sk-ant-...)"
                 value={apiKey}
                 onChange={(e) => handleKeyChange(e.target.value)}
-                className="w-full px-3.5 py-2.5 bg-[#1a1a1f] border border-[#3a3a42] rounded-lg text-[#ccc] text-[13px] mb-4 outline-none"
+                className="w-full px-3.5 py-2.5 bg-[var(--surface-0)] border border-[var(--line)] rounded-lg text-[#ccc] text-[13px] mb-4 outline-none"
               />
             )}
 
@@ -308,7 +341,7 @@ export default function ChatPanel({
                 onKeyDown={handleKeyDown}
                 placeholder="Describe your fin wall..."
                 rows={3}
-                className="flex-1 px-3.5 py-3 bg-[#1a1a1f] border border-[#3a3a42] rounded-lg text-white text-[14px] resize-none outline-none font-[inherit] focus:border-[#7c9bff] transition-colors placeholder:text-[#666]"
+                className="flex-1 px-3.5 py-3 bg-[var(--surface-0)] border border-[var(--line)] rounded-lg text-white text-[14px] resize-none outline-none font-[inherit] focus:border-[var(--gold)] transition-colors placeholder:text-[#666]"
               />
               <button
                 onClick={sendMessage}
@@ -316,7 +349,7 @@ export default function ChatPanel({
                 className={`px-6 py-3 border-none rounded-lg text-[14px] font-semibold text-white self-end ${
                   loading || !input.trim()
                     ? 'bg-[#555] cursor-default'
-                    : 'bg-[#7c9bff] cursor-pointer hover:bg-[#6b8aee]'
+                    : 'bg-[var(--gold)] text-[#1a1a14] cursor-pointer hover:bg-[var(--gold-bright)]'
                 }`}
               >
                 {loading ? '...' : 'Send'}
@@ -325,7 +358,7 @@ export default function ChatPanel({
 
             {/* Loading state */}
             {loading && (
-              <div className="text-center text-[#7c9bff] text-[13px] mt-4">
+              <div className="text-center text-[var(--gold)] text-[13px] mt-4">
                 Configuring your fin wall...
               </div>
             )}
@@ -344,8 +377,8 @@ export default function ChatPanel({
       <div
         className={
           isDrawer
-            ? "absolute top-0 right-0 h-full flex flex-col bg-[#2a2a30] border-l border-[#3a3a42] shadow-[-8px_0_32px_rgba(0,0,0,0.4)] z-50"
-            : "flex flex-col bg-[#2a2a30] border-r border-[#3a3a42] h-screen"
+            ? "absolute top-0 right-0 h-full flex flex-col bg-[var(--surface-1)] border-l border-[var(--line)] shadow-[-8px_0_32px_rgba(0,0,0,0.4)] z-50"
+            : "flex flex-col bg-[var(--surface-1)] border-r border-[var(--line)] h-screen"
         }
         style={
           isDrawer
@@ -365,7 +398,7 @@ export default function ChatPanel({
         }
       >
         {/* Header + API Keys */}
-        <div className="p-4 px-6 border-b border-[#3a3a42]">
+        <div className="p-4 px-6 border-b border-[var(--line)]">
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2.5">
               <div className="w-7 h-7 rounded-full bg-gradient-to-br from-[#d4af37] to-[#b8941f] flex items-center justify-center text-[12px] font-bold text-white shadow-[0_2px_8px_rgba(212,175,55,0.4)]">M</div>
@@ -377,7 +410,7 @@ export default function ChatPanel({
             {onClose && (
               <button
                 onClick={onClose}
-                className="w-9 h-9 rounded-md text-white bg-[#3a3a42] hover:bg-[#5a5a62] border border-[#5a5a62] transition-colors flex items-center justify-center text-2xl leading-none font-bold shrink-0"
+                className="w-9 h-9 rounded-md text-white bg-[var(--surface-3)] hover:bg-[var(--surface-4)] border border-[var(--line-strong)] transition-colors flex items-center justify-center text-2xl leading-none font-bold shrink-0"
                 aria-label="Close"
                 title="Close (Esc)"
               >
@@ -391,7 +424,7 @@ export default function ChatPanel({
               placeholder="Anthropic API Key (sk-ant-...)"
               value={apiKey}
               onChange={(e) => handleKeyChange(e.target.value)}
-              className="w-full px-2.5 py-1.5 bg-[#1a1a1f] border border-[#3a3a42] rounded text-[#ccc] text-[11px] mb-1.5 outline-none"
+              className="w-full px-2.5 py-1.5 bg-[var(--surface-0)] border border-[var(--line)] rounded text-[#ccc] text-[11px] mb-1.5 outline-none"
             />
           )}
         </div>
@@ -401,14 +434,14 @@ export default function ChatPanel({
           <button
             onClick={() => setShowAbout(!showAbout)}
             className={`w-full py-1.5 border rounded-md text-[11px] cursor-pointer font-medium transition-colors ${
-              showAbout ? 'bg-[#3a3a52] border-[#3a3a42] text-[#7c9bff]' : 'bg-transparent border-[#3a3a42] text-[#888]'
+              showAbout ? 'bg-[var(--surface-3)] border-[var(--gold-deep)] text-[var(--gold-bright)]' : 'bg-transparent border-[var(--line)] text-[#888]'
             }`}
           >
             {showAbout ? 'Hide Guide' : 'How to Use'}
           </button>
           {showAbout && (
-            <div className="p-3 bg-[#1a1a1f] rounded-lg mt-1.5 text-[11px] text-[#bbb] leading-relaxed max-h-[260px] overflow-y-auto">
-              <div className="font-bold text-[#7c9bff] mb-1.5 text-xs">M|R Walls Fin Maker</div>
+            <div className="p-3 bg-[var(--surface-0)] rounded-lg mt-1.5 text-[11px] text-[#bbb] leading-relaxed max-h-[260px] overflow-y-auto">
+              <div className="font-bold text-[var(--gold)] mb-1.5 text-xs">M|R Walls Fin Maker</div>
               <p className="mb-2">Design custom architectural fin wall panels by describing what you want in the chat. The AI will configure the 3D preview in real time.</p>
               <div className="font-semibold text-[#ccc] mb-1">What you can do:</div>
               <ul className="mb-2 pl-4 list-disc space-y-0.5">
@@ -437,17 +470,34 @@ export default function ChatPanel({
               <div
                 className={`px-4 py-3 text-[15px] leading-[1.55] max-w-[90%] whitespace-pre-wrap ${
                   msg.role === 'user'
-                    ? 'bg-[#7c9bff] rounded-[16px_16px_4px_16px]'
-                    : 'bg-[#3a3a42] rounded-[16px_16px_16px_4px]'
-                } text-white`}
+                    ? 'bg-[var(--gold)] text-[#1a1a14] rounded-[16px_16px_4px_16px]'
+                    : 'bg-[var(--surface-3)] text-[var(--ink)] rounded-[16px_16px_16px_4px]'
+                }`}
               >
                 {msg.content}
               </div>
+              {msg.applied && msg.applied.length > 0 && (
+                <div className="mt-2 max-w-[90%] rounded-xl border border-[var(--line)] bg-[var(--surface-2)] px-3 py-2.5 animate-fade-in-up">
+                  <div className="flex items-center gap-1.5 mb-2">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                      <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                    <span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--ink-muted)]">Applied to your design</span>
+                  </div>
+                  <div className="flex flex-wrap gap-1.5">
+                    {msg.applied.map((chip, ci) => (
+                      <span key={ci} className="text-[11.5px] text-[var(--ink-soft)] bg-[var(--surface-4)] rounded-md px-2 py-1 leading-none">
+                        {chip}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
               {msg.imageUrl && (
                 <img
                   src={msg.imageUrl}
                   alt="Rendered"
-                  className="mt-2 max-w-[90%] rounded-lg cursor-pointer border border-[#3a3a42]"
+                  className="mt-2 max-w-[90%] rounded-lg cursor-pointer border border-[var(--line)]"
                   onClick={() => setRenderResult(msg.imageUrl!)}
                 />
               )}
@@ -462,7 +512,7 @@ export default function ChatPanel({
                 <button
                   key={i}
                   onClick={() => { setInput(s); }}
-                  className="text-left px-4 py-3 rounded-xl bg-[#33333b] hover:bg-[#3d3d47] border border-[#45454f] text-[#ddd] text-[14px] leading-snug transition-colors"
+                  className="text-left px-4 py-3 rounded-xl bg-[var(--surface-2)] hover:bg-[var(--surface-3)] border border-[var(--line)] text-[var(--ink-soft)] text-[14px] leading-snug transition-colors"
                 >
                   {s}
                 </button>
@@ -471,8 +521,8 @@ export default function ChatPanel({
           )}
 
           {loading && (
-            <div className="px-4 py-3 rounded-[16px_16px_16px_4px] bg-[#3a3a42] text-[#aaa] text-[15px] inline-flex items-center gap-2">
-              <span className="inline-block w-2 h-2 rounded-full bg-[#7c9bff] animate-pulse" />
+            <div className="px-4 py-3 rounded-[16px_16px_16px_4px] bg-[var(--surface-3)] text-[var(--ink-soft)] text-[15px] inline-flex items-center gap-2">
+              <span className="inline-block w-2 h-2 rounded-full bg-[var(--gold)] animate-pulse" />
               Configuring your wall…
             </div>
           )}
@@ -493,7 +543,7 @@ export default function ChatPanel({
               onKeyDown={handleKeyDown}
               placeholder="Describe your fin wall…  e.g. “60 deep flowing fins for a hotel lobby”"
               rows={3}
-              className="w-full pl-4 pr-14 py-3.5 bg-[#1a1a1f] border border-[#4a4a55] rounded-2xl text-white text-[15px] leading-relaxed resize-none outline-none font-[inherit] focus:border-[#7c9bff] transition-colors placeholder:text-[#666]"
+              className="w-full pl-4 pr-14 py-3.5 bg-[var(--surface-0)] border border-[#4a4a55] rounded-2xl text-white text-[15px] leading-relaxed resize-none outline-none font-[inherit] focus:border-[var(--gold)] transition-colors placeholder:text-[#666]"
             />
             <button
               onClick={sendMessage}
@@ -502,7 +552,7 @@ export default function ChatPanel({
               className={`absolute right-2.5 bottom-2.5 w-10 h-10 rounded-full flex items-center justify-center transition-all ${
                 loading || !input.trim()
                   ? 'bg-[#444] text-[#888] cursor-default'
-                  : 'bg-[#7c9bff] text-white cursor-pointer hover:bg-[#6b8aee] shadow-[0_2px_8px_rgba(124,155,255,0.4)]'
+                  : 'bg-[var(--gold)] text-[#1a1a14] cursor-pointer hover:bg-[var(--gold-bright)] shadow-[0_2px_10px_rgba(201,169,106,0.4)]'
               }`}
             >
               {loading ? (
@@ -554,7 +604,7 @@ export default function ChatPanel({
                     window.open(renderResult, '_blank');
                   }
                 }}
-                className="px-6 py-2.5 bg-[#7c9bff] text-white rounded-md text-[13px] font-semibold cursor-pointer border-none"
+                className="px-6 py-2.5 bg-[var(--gold)] text-[#1a1a14] rounded-md text-[13px] font-semibold cursor-pointer border-none"
               >
                 Download
               </button>

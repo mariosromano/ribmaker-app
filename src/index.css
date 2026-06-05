@@ -1,5 +1,36 @@
 @import "tailwindcss";
 
+/* ──────────────────────────────────────────────────────────────
+   M|R Walls Fin Maker — Premium design tokens
+   Warm black surfaces · champagne/gold accents · refined type
+   ────────────────────────────────────────────────────────────── */
+:root {
+  /* Warm near-black surface ramp */
+  --surface-0: #141413;   /* deepest — viewport bg */
+  --surface-1: #1c1b19;   /* panel base */
+  --surface-2: #242320;   /* cards / sections */
+  --surface-3: #2d2b27;   /* elevated / hover */
+  --surface-4: #38352f;   /* controls / pressed */
+
+  /* Champagne / gold accent */
+  --gold: #c9a96a;        /* primary champagne accent */
+  --gold-bright: #e2c585; /* hover / highlight */
+  --gold-deep: #a8884c;   /* pressed / borders */
+
+  /* Text */
+  --ink: #f4f1ea;         /* warm white */
+  --ink-soft: #b8b3a8;    /* secondary */
+  --ink-muted: #837e74;   /* tertiary / labels */
+  --ink-faint: #5a564e;   /* hints */
+
+  /* Hairline borders */
+  --line: rgba(244, 241, 234, 0.08);
+  --line-strong: rgba(244, 241, 234, 0.14);
+
+  /* Positive (price/value) — muted sage, not neon */
+  --value: #a8c99a;
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -8,60 +39,88 @@
 
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  background: #1a1a1f;
-  color: white;
+  background: var(--surface-0);
+  color: var(--ink);
   overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
-/* Range slider styling */
+/* Refined range slider — thin warm track, champagne thumb with ring */
 input[type="range"] {
   -webkit-appearance: none;
   width: 100%;
-  height: 4px;
-  border-radius: 2px;
-  background: #555;
+  height: 3px;
+  border-radius: 999px;
+  background: #45423b;
   outline: none;
+  cursor: pointer;
 }
 
 input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none;
-  width: 16px;
-  height: 16px;
+  width: 15px;
+  height: 15px;
   border-radius: 50%;
-  background: #7c9bff;
+  background: var(--gold);
   cursor: pointer;
+  box-shadow: 0 0 0 4px rgba(201, 169, 106, 0.14), 0 1px 3px rgba(0,0,0,0.4);
+  transition: box-shadow 0.15s ease, background 0.15s ease;
+}
+input[type="range"]::-webkit-slider-thumb:hover {
+  background: var(--gold-bright);
+  box-shadow: 0 0 0 6px rgba(201, 169, 106, 0.2), 0 1px 3px rgba(0,0,0,0.4);
 }
 
 input[type="range"]::-moz-range-thumb {
-  width: 16px;
-  height: 16px;
+  width: 15px;
+  height: 15px;
   border-radius: 50%;
-  background: #7c9bff;
+  background: var(--gold);
   cursor: pointer;
   border: none;
+  box-shadow: 0 0 0 4px rgba(201, 169, 106, 0.14);
 }
 
-/* Custom scrollbar */
+/* Custom scrollbar — slim, warm, unobtrusive */
 ::-webkit-scrollbar {
-  width: 6px;
+  width: 7px;
+  height: 7px;
 }
 ::-webkit-scrollbar-track {
-  background: #2a2a30;
+  background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: #555;
-  border-radius: 3px;
+  background: rgba(244, 241, 234, 0.1);
+  border-radius: 999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #777;
+  background: rgba(201, 169, 106, 0.4);
 }
 
+/* Color input — rounded, hairline border, no chunky chrome */
+input[type="color"] {
+  -webkit-appearance: none;
+  border: 1px solid var(--line-strong);
+  border-radius: 8px;
+  cursor: pointer;
+  background: transparent;
+  padding: 0;
+}
+input[type="color"]::-webkit-color-swatch-wrapper { padding: 3px; }
+input[type="color"]::-webkit-color-swatch { border: none; border-radius: 5px; }
+
+/* Motion */
 @keyframes floatCardIn {
   from { opacity: 0; transform: translateY(20px) scale(0.97); }
   to { opacity: 1; transform: translateY(0) scale(1); }
 }
-
 @keyframes floatCardOut {
   from { opacity: 1; transform: translateY(0) scale(1); }
   to { opacity: 0; transform: translateY(-10px) scale(0.97); }
 }
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-in-up { animation: fadeInUp 0.35s ease-out; }

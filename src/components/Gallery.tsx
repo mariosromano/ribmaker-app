@@ -56,7 +56,7 @@ export default function Gallery({ open, onClose }: GalleryProps) {
         <div className="sticky top-0 z-10 bg-black/60 backdrop-blur-sm border-b border-white/10">
           <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
             <div>
-              <div className="text-[18px] font-bold tracking-tight text-[#d4af37]">
+              <div className="text-[18px] font-bold tracking-tight text-[var(--gold)]">
                 M|R Walls — Recent Installs
               </div>
               <div className="text-[11px] font-mono tracking-widest uppercase text-[#888] mt-0.5">
@@ -83,7 +83,7 @@ export default function Gallery({ open, onClose }: GalleryProps) {
               <button
                 key={src}
                 onClick={() => setLightboxIndex(i)}
-                className="relative aspect-[4/3] overflow-hidden rounded-lg bg-[#1a1a1f] group cursor-zoom-in"
+                className="relative aspect-[4/3] overflow-hidden rounded-lg bg-[var(--surface-1)] group cursor-zoom-in"
               >
                 <img
                   src={src}

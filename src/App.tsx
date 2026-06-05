@@ -66,6 +66,7 @@ interface RightPanelProps {
   onOpenAskMara: () => void;
   onOpenGallery: () => void;
   onOpenInstall: () => void;
+  onEnterPresentation: () => void;
   panelWidth: number;
 }
 
@@ -79,7 +80,7 @@ function RightPanel(props: RightPanelProps) {
     wallpaperEnabled, onWallpaperEnabledChange, scaleFigureEnabled,
     onScaleFigureEnabledChange, imageScale, onImageScaleChange,
     onImageModeChange, ribProfiles, rendererRef, sceneRef, cameraRef,
-    onOpenAskMara, onOpenGallery, onOpenInstall, panelWidth,
+    onOpenAskMara, onOpenGallery, onOpenInstall, onEnterPresentation, panelWidth,
   } = props;
 
   const pricing = useMemo(
@@ -91,80 +92,92 @@ function RightPanel(props: RightPanelProps) {
 
   return (
     <div
-      className="bg-[#2a2a30] h-screen overflow-y-auto py-5 px-6 flex flex-col"
+      className="bg-[var(--surface-1)] h-screen overflow-y-auto py-5 px-5 flex flex-col border-l border-[var(--line)]"
       style={{ width: panelWidth, minWidth: panelWidth }}
     >
       <div className="flex-1">
         {/* Brand */}
-        <div className="mb-3">
-          <div className="text-[18px] font-bold tracking-tight leading-tight text-[#d4af37]">
-            MAKE REAL
+        <div className="mb-4 flex items-center justify-between">
+          <div className="flex items-baseline gap-2">
+            <div className="text-[19px] font-semibold tracking-tight leading-none text-[var(--ink)]">
+              M<span className="text-[var(--gold)]">|</span>R Walls
+            </div>
+            <div className="text-[10px] font-medium text-[var(--ink-muted)] font-mono tracking-[0.2em] uppercase">Fin Maker</div>
           </div>
-          <div className="text-[11px] font-medium text-[#888] mt-0.5 font-mono tracking-widest uppercase">Fin Maker</div>
+          <button
+            onClick={onEnterPresentation}
+            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[var(--ink-muted)] hover:text-[var(--gold-bright)] hover:bg-[var(--surface-2)] transition-colors text-[10.5px] font-medium"
+            title="Presentation mode — full-screen preview"
+          >
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3" />
+            </svg>
+            Present
+          </button>
         </div>
 
         {/* Action toolbar: three peer references — see built work, learn install, talk to Mara */}
-        <div className="grid grid-cols-3 gap-2 mb-3">
+        <div className="grid grid-cols-3 gap-2 mb-4">
           <button
             onClick={onOpenGallery}
-            className="flex flex-col items-center justify-center gap-1 py-2.5 rounded-lg bg-white/8 hover:bg-white/14 text-white text-[11px] font-semibold transition-colors border border-white/10"
+            className="flex flex-col items-center justify-center gap-1.5 py-3 rounded-xl bg-[var(--surface-2)] hover:bg-[var(--surface-3)] text-[var(--ink-soft)] text-[10.5px] font-medium transition-colors border border-[var(--line)]"
             title="See built work"
           >
-            <span className="text-[16px] leading-none">▦</span>
+            <span className="text-[15px] leading-none text-[var(--ink-muted)]">▦</span>
             Gallery
           </button>
           <button
             onClick={onOpenInstall}
-            className="flex flex-col items-center justify-center gap-1 py-2.5 rounded-lg bg-white/8 hover:bg-white/14 text-white text-[11px] font-semibold transition-colors border border-white/10"
+            className="flex flex-col items-center justify-center gap-1.5 py-3 rounded-xl bg-[var(--surface-2)] hover:bg-[var(--surface-3)] text-[var(--ink-soft)] text-[10.5px] font-medium transition-colors border border-[var(--line)]"
             title="Step-by-step assembly drawings"
           >
-            <span className="text-[16px] leading-none">⚙</span>
+            <span className="text-[15px] leading-none text-[var(--ink-muted)]">⚙</span>
             Install
           </button>
           <button
             onClick={onOpenAskMara}
-            className="flex flex-col items-center justify-center gap-1 py-2.5 rounded-lg text-white text-[11px] font-bold bg-gradient-to-br from-[#d4af37] to-[#b8941f] shadow-[0_2px_10px_rgba(212,175,55,0.35)] hover:brightness-110 transition-all border border-[#d4af37]/40"
-            title="AI configurator"
+            className="flex flex-col items-center justify-center gap-1.5 py-3 rounded-xl text-[#1a1a14] text-[10.5px] font-semibold bg-gradient-to-br from-[var(--gold-bright)] to-[var(--gold)] shadow-[0_2px_14px_rgba(201,169,106,0.28)] hover:brightness-105 transition-all"
+            title="AI design concierge"
           >
-            <span className="w-5 h-5 rounded-full bg-white/25 flex items-center justify-center text-[11px] font-bold leading-none">M</span>
+            <span className="w-5 h-5 rounded-full bg-black/15 flex items-center justify-center text-[11px] font-bold leading-none">M</span>
             Ask Mara
           </button>
         </div>
 
-        {/* Price card */}
-        <div className="bg-[#2d4a2d] rounded-lg px-3 py-2 text-right mb-3 flex items-center justify-between">
-          <div className="text-[9px] text-[#8eff8e]/70 uppercase tracking-wider">Est. Price</div>
-          <div className="text-[17px] font-bold text-[#8eff8e] leading-none font-mono">{fmtPrice(pricing.totalPrice)}</div>
-        </div>
-
-        {/* Quick summary (always visible) */}
-        <div className="bg-[#3a3a42] rounded-lg p-4 mb-3">
-          <div className="grid grid-cols-3 gap-2 text-center text-[11px]">
+        {/* Quick summary — at-a-glance spec + price */}
+        <div className="rounded-xl border border-[var(--line)] bg-[var(--surface-2)] p-4 mb-3">
+          <div className="grid grid-cols-3 gap-2 text-center">
             <div>
-              <div className="text-[#888] mb-0.5">Fins</div>
-              <div className="text-white font-bold text-sm">{params.count}</div>
+              <div className="text-[10px] text-[var(--ink-muted)] mb-1 uppercase tracking-wider">Fins</div>
+              <div className="text-[var(--ink)] font-semibold text-[15px]">{params.count}</div>
             </div>
             <div>
-              <div className="text-[#888] mb-0.5">Height</div>
-              <div className="text-white font-bold text-sm">{params.height}"</div>
+              <div className="text-[10px] text-[var(--ink-muted)] mb-1 uppercase tracking-wider">Height</div>
+              <div className="text-[var(--ink)] font-semibold text-[15px]">{Math.floor(params.height / 12)}′</div>
             </div>
             <div>
-              <div className="text-[#888] mb-0.5">Depth</div>
-              <div className="text-white font-bold text-sm">{params.maxDepth}"</div>
+              <div className="text-[10px] text-[var(--ink-muted)] mb-1 uppercase tracking-wider">Depth</div>
+              <div className="text-[var(--ink)] font-semibold text-[15px]">{params.maxDepth}″</div>
             </div>
           </div>
-          <div className="flex items-center justify-between mt-3 pt-3 border-t border-[#4a4a52]">
-            <span className="text-[11px] text-[#ccc]">Scale Figure</span>
-            <label className="relative w-11 h-6 cursor-pointer">
-              <input
-                type="checkbox"
-                className="sr-only peer"
-                checked={scaleFigureEnabled}
-                onChange={(e) => onScaleFigureEnabledChange(e.target.checked)}
-              />
-              <div className="w-11 h-6 bg-[#555] rounded-full peer-checked:bg-[#7c9bff] transition-colors" />
-              <div className="absolute left-[3px] bottom-[3px] w-[18px] h-[18px] bg-white rounded-full transition-transform peer-checked:translate-x-5" />
-            </label>
+          <div className="flex items-center justify-between mt-3.5 pt-3.5 border-t border-[var(--line)]">
+            <div>
+              <span className="text-[10px] text-[var(--ink-muted)] uppercase tracking-wider">Est. Investment</span>
+              <div className="text-[20px] font-semibold text-[var(--ink)] font-mono leading-tight mt-0.5">{fmtPrice(pricing.totalPrice)}</div>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] text-[var(--ink-muted)]">Scale figure</span>
+              <label className="relative w-10 h-[22px] cursor-pointer">
+                <input
+                  type="checkbox"
+                  className="sr-only peer"
+                  checked={scaleFigureEnabled}
+                  onChange={(e) => onScaleFigureEnabledChange(e.target.checked)}
+                />
+                <div className="w-10 h-[22px] bg-[var(--surface-4)] rounded-full peer-checked:bg-[var(--gold)] transition-colors" />
+                <div className="absolute left-[3px] bottom-[3px] w-4 h-4 bg-white rounded-full transition-transform peer-checked:translate-x-[18px] shadow-sm" />
+              </label>
+            </div>
           </div>
         </div>
 
@@ -213,29 +226,30 @@ function RightPanel(props: RightPanelProps) {
         />
 
         {/* Studio CTA — for projects that exceed the configurator's range */}
-        <div className="mt-4 p-4 rounded-lg bg-gradient-to-br from-[#2a2a30] to-[#1f1f24] border border-[#3a3a42]">
-          <div className="text-[12px] font-semibold text-white mb-1.5">
-            Need something the configurator can't quite do?
+        <div className="mt-4 p-4 rounded-xl bg-[var(--surface-2)] border border-[var(--line)]">
+          <div className="text-[12.5px] font-semibold text-[var(--ink)] mb-1.5">
+            Need something bespoke?
           </div>
-          <p className="text-[11px] text-[#aaa] leading-relaxed mb-3">
+          <p className="text-[11.5px] text-[var(--ink-muted)] leading-relaxed mb-3">
             Our studio handles custom shapes, oversized installs, and full design collaboration.
           </p>
           <a
             href="mailto:orders@marioromano.com?subject=Custom%20Fin%20Project%20Inquiry&body=Hi%20M%7CR%20Studio%2C%0A%0AI%27m%20working%20on%20a%20project%20that%20goes%20beyond%20the%20standard%20configurator.%20Here%27s%20what%20I%27m%20trying%20to%20achieve%3A%0A%0A%5BDescribe%20your%20project%5D%0A%0AThanks%2C"
             onClick={() => track('studio_contact_clicked')}
-            className="block w-full py-2.5 rounded-md text-center text-[12px] font-semibold text-white bg-[#4a4a52] hover:bg-[#5a5a62] transition-colors"
+            className="flex items-center justify-center gap-1.5 w-full py-2.5 rounded-lg text-center text-[12px] font-semibold text-[var(--gold-bright)] border border-[var(--gold-deep)]/40 hover:bg-[var(--gold)]/10 transition-colors"
           >
-            Talk to M|R Studio →
+            Talk to M|R Studio
+            <span className="text-[13px]">→</span>
           </a>
         </div>
 
         {/* Footer — legal */}
-        <div className="mt-3 text-[10px] text-[#666] text-center">
+        <div className="mt-3.5 text-[10px] text-[var(--ink-faint)] text-center">
           <a
             href="https://mrwalls.io/privacy-policy"
             target="_blank"
             rel="noopener noreferrer"
-            className="hover:underline"
+            className="hover:text-[var(--ink-muted)] transition-colors"
           >
             Privacy Policy
           </a>
@@ -268,6 +282,15 @@ export default function App() {
   const [askMaraOpen, setAskMaraOpen] = useState(false);
   const [galleryOpen, setGalleryOpen] = useState(false);
   const [installOpen, setInstallOpen] = useState(false);
+  const [presentationMode, setPresentationMode] = useState(false);
+
+  // Exit presentation mode on Escape
+  useEffect(() => {
+    if (!presentationMode) return;
+    const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') setPresentationMode(false); };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [presentationMode]);
 
   // Resizable panel — drag the left-edge handle to resize 280..500px
   const [panelWidth, setPanelWidth] = useState(() => {
@@ -342,12 +365,29 @@ export default function App() {
         cameraRef={cameraRef}
       />
 
-      {/* Right: drag-handle + Controls panel — always docked */}
+      {/* Presentation mode: floating pill to exit, panels hidden */}
+      {presentationMode && (
+        <button
+          onClick={() => setPresentationMode(false)}
+          className="fixed top-5 right-5 z-50 flex items-center gap-2 px-4 py-2.5 rounded-full bg-[var(--surface-1)]/90 backdrop-blur border border-[var(--line-strong)] text-[var(--ink-soft)] text-[12px] font-medium hover:text-[var(--ink)] hover:border-[var(--gold-deep)] transition-all shadow-[0_4px_20px_rgba(0,0,0,0.4)] animate-fade-in-up"
+          title="Exit presentation (Esc)"
+        >
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3" />
+          </svg>
+          Exit Presentation
+        </button>
+      )}
+
+      {/* Right: drag-handle + Controls panel — hidden in presentation mode */}
+      {!presentationMode && (
       <div
         onMouseDown={handleResizeStart}
-        className="w-1 hover:w-1.5 hover:bg-[#7c9bff] cursor-ew-resize transition-all shrink-0"
+        className="w-1 hover:w-1.5 hover:bg-[var(--gold)] cursor-ew-resize transition-all shrink-0"
         title="Drag to resize"
       />
+      )}
+      {!presentationMode && (
       <RightPanel
         params={params}
         onParamsChange={setParams}
@@ -383,8 +423,10 @@ export default function App() {
         onOpenAskMara={() => { setAskMaraOpen(true); track('mara_opened'); }}
         onOpenGallery={() => { setGalleryOpen(true); track('gallery_opened'); }}
         onOpenInstall={() => { setInstallOpen(true); track('install_guide_opened'); }}
+        onEnterPresentation={() => { setPresentationMode(true); track('presentation_mode_entered'); }}
         panelWidth={panelWidth}
       />
+      )}
 
       <Gallery open={galleryOpen} onClose={() => setGalleryOpen(false)} />
       <InstallationGuide open={installOpen} onClose={() => setInstallOpen(false)} />
